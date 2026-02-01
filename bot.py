@@ -95,6 +95,45 @@ def event():
     events = db_supabase.get_events()
     return render_template('event.html', lang=lang, events=events)
 
+# --- DASHBOARD ROUTES ---
+
+@app.route('/dashboard')
+def dashboard():
+    """Halaman Dashboard Admin"""
+    mitras = db_supabase.get_mitras()
+    wisata = db_supabase.get_wisata()
+    promos = db_supabase.get_promos()
+    events = db_supabase.get_events()
+    return render_template('dashboard.html', mitras=mitras, wisata=wisata, promos=promos, events=events)
+
+@app.route('/api/create/<table_name>', methods=['POST'])
+def api_create(table_name):
+    """API untuk Create Record"""
+    data = request.json
+    result = db_supabase.create_record(table_name, data)
+    if result:
+        return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"status": "error"}), 500
+
+@app.route('/api/update/<table_name>/<id>', methods=['POST'])
+def api_update(table_name, id):
+    """API untuk Update Record"""
+    data = request.json
+    result = db_supabase.update_record(table_name, id, data)
+    if result:
+        return jsonify({"status": "success", "data": result}), 200
+    return jsonify({"status": "error"}), 500
+
+@app.route('/api/delete/<table_name>/<id>', methods=['POST', 'DELETE'])
+def api_delete(table_name, id):
+    """API untuk Delete Record"""
+    result = db_supabase.delete_record(table_name, id)
+    if result:
+        return jsonify({"status": "success"}), 200
+    return jsonify({"status": "error"}), 500
+
+# --- END DASHBOARD ROUTES ---
+
 def get_main_keyboard(lang_code):
     t = lambda key: get_text(lang_code, key)
     kb = [

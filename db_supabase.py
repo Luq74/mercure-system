@@ -23,6 +23,7 @@ def get_mitras():
         formatted_data = []
         for item in raw_data:
             formatted_data.append({
+                "db_id": item.get('id'),
                 "img": item.get('image_url', ''),
                 "id": { "name": item.get('name_id', item.get('name', '')), "desc": item.get('desc_id', '') },
                 "en": { "name": item.get('name_en', item.get('name', '')), "desc": item.get('desc_en', '') },
@@ -63,6 +64,7 @@ def get_promos():
         formatted_data = []
         for item in raw_data:
             formatted_data.append({
+                "db_id": item.get('id'),
                 "img": item.get('image_url', ''),
                 "id": { "title": item.get('title_id', ''), "desc": item.get('desc_id', '') },
                 "en": { "title": item.get('title_en', ''), "desc": item.get('desc_en', '') },
@@ -83,6 +85,7 @@ def get_events():
         formatted_data = []
         for item in raw_data:
             formatted_data.append({
+                "db_id": item.get('id'),
                 "img": item.get('image_url', ''),
                 "id": { "title": item.get('title_id', ''), "desc": item.get('desc_id', '') },
                 "en": { "title": item.get('title_en', ''), "desc": item.get('desc_en', '') },
@@ -109,4 +112,36 @@ def save_claim(user_id, user_name, mitra, promo, resi):
         return True
     except Exception as e:
         print(f"Error saving claim: {e}")
+        return False
+
+# --- CRUD Operations for Dashboard ---
+
+def create_record(table, data):
+    """Generic create function"""
+    if not supabase: return None
+    try:
+        response = supabase.table(table).insert(data).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error creating record in {table}: {e}")
+        return None
+
+def update_record(table, id, data):
+    """Generic update function"""
+    if not supabase: return None
+    try:
+        response = supabase.table(table).update(data).eq('id', id).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error updating record in {table} id {id}: {e}")
+        return None
+
+def delete_record(table, id):
+    """Generic delete function"""
+    if not supabase: return False
+    try:
+        supabase.table(table).delete().eq('id', id).execute()
+        return True
+    except Exception as e:
+        print(f"Error deleting record in {table} id {id}: {e}")
         return False

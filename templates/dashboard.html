@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin Mercure</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; }
+        .nav-tabs .nav-link.active { background-color: #5D2F61; color: white; border-color: #5D2F61; }
+        .nav-tabs .nav-link { color: #5D2F61; }
+        .btn-primary { background-color: #5D2F61; border-color: #5D2F61; }
+        .btn-primary:hover { background-color: #4a254e; border-color: #4a254e; }
+        .card-img-top { height: 150px; object-fit: cover; }
+        .action-btn { cursor: pointer; margin-right: 5px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">Mercure System Dashboard</span>
+            <a href="/" class="btn btn-outline-light btn-sm" target="_blank">Lihat Bot Web App</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="mitra-tab" data-bs-toggle="tab" data-bs-target="#mitra" type="button" role="tab">Katalog Mitra (Voucher)</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="wisata-tab" data-bs-toggle="tab" data-bs-target="#wisata" type="button" role="tab">Info Wisata</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="promo-tab" data-bs-toggle="tab" data-bs-target="#promo" type="button" role="tab">Promo Hotel</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="event-tab" data-bs-toggle="tab" data-bs-target="#event" type="button" role="tab">Event & Acara</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            
+            <!-- MITRA TAB -->
+            <div class="tab-pane fade show active" id="mitra" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Daftar Mitra & Voucher</h4>
+                    <button class="btn btn-primary" onclick="openModal('partners')">+ Tambah Mitra</button>
+                </div>
+                <div class="row" id="mitra-list">
+                    <!-- Loop Data from Server -->
+                    {% for item in mitras %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <img src="{{ item.img }}" class="card-img-top" alt="Image">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.id.name }}</h5>
+                                <p class="card-text text-muted small">{{ item.id.desc }}</p>
+                                <hr>
+                                <button class="btn btn-sm btn-warning" onclick='editItem("partners", {{ item | tojson }})'>Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick='deleteItem("partners", "{{ item.db_id }}")'>Hapus</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- WISATA TAB -->
+            <div class="tab-pane fade" id="wisata" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Info Wisata</h4>
+                    <button class="btn btn-primary" onclick="openModal('attractions')">+ Tambah Wisata</button>
+                </div>
+                <div class="row">
+                    {% for item in wisata %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <img src="{{ item.img }}" class="card-img-top" alt="Image">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.id.title }}</h5>
+                                <p class="card-text small">{{ item.id.desc }}</p>
+                                <a href="{{ item.url }}" target="_blank" class="small text-primary">Map Link</a>
+                                <hr>
+                                <button class="btn btn-sm btn-warning" onclick='editItem("attractions", {{ item | tojson }})'>Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick='deleteItem("attractions", "{{ item.db_id }}")'>Hapus</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- PROMO TAB -->
+            <div class="tab-pane fade" id="promo" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Promo Hotel</h4>
+                    <button class="btn btn-primary" onclick="openModal('hotel_promos')">+ Tambah Promo</button>
+                </div>
+                <div class="row">
+                    {% for item in promos %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <img src="{{ item.img }}" class="card-img-top" alt="Image">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.id.title }}</h5>
+                                <p class="card-text small">{{ item.id.desc }}</p>
+                                <hr>
+                                <button class="btn btn-sm btn-warning" onclick='editItem("hotel_promos", {{ item | tojson }})'>Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick='deleteItem("hotel_promos", "{{ item.db_id }}")'>Hapus</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- EVENT TAB -->
+            <div class="tab-pane fade" id="event" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Event & Acara</h4>
+                    <button class="btn btn-primary" onclick="openModal('events')">+ Tambah Event</button>
+                </div>
+                <div class="row">
+                    {% for item in events %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <img src="{{ item.img }}" class="card-img-top" alt="Image">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.id.title }}</h5>
+                                <p class="card-text small">{{ item.id.desc }}</p>
+                                <hr>
+                                <button class="btn btn-sm btn-warning" onclick='editItem("events", {{ item | tojson }})'>Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick='deleteItem("events", "{{ item.db_id }}")'>Hapus</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Form -->
+    <div class="modal fade" id="formModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Edit Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dataForm">
+                        <input type="hidden" id="item_id">
+                        <input type="hidden" id="table_name">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Image URL</label>
+                            <input type="text" class="form-control" id="image_url" placeholder="https://...">
+                        </div>
+                        
+                        <div class="mb-3" id="map_url_container" style="display:none;">
+                            <label class="form-label">Map URL (Google Maps)</label>
+                            <input type="text" class="form-control" id="map_url">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>Bahasa Indonesia (ID)</h6>
+                                <div class="mb-2">
+                                    <label>Judul / Nama</label>
+                                    <input type="text" class="form-control" id="title_id">
+                                </div>
+                                <div class="mb-2">
+                                    <label>Deskripsi <small class="text-danger">*Voucher Info</small></label>
+                                    <textarea class="form-control" id="desc_id" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>English (EN)</h6>
+                                <div class="mb-2">
+                                    <label>Title / Name</label>
+                                    <input type="text" class="form-control" id="title_en">
+                                </div>
+                                <div class="mb-2">
+                                    <label>Description</label>
+                                    <textarea class="form-control" id="desc_en" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Chinese (CN)</h6>
+                                <div class="mb-2">
+                                    <label>Title / Name</label>
+                                    <input type="text" class="form-control" id="title_cn">
+                                </div>
+                                <div class="mb-2">
+                                    <label>Description</label>
+                                    <textarea class="form-control" id="desc_cn" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="saveData()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const modal = new bootstrap.Modal(document.getElementById('formModal'));
+        
+        function openModal(table) {
+            document.getElementById('dataForm').reset();
+            document.getElementById('item_id').value = '';
+            document.getElementById('table_name').value = table;
+            document.getElementById('modalTitle').innerText = 'Tambah Data Baru';
+            
+            // Show/Hide Map URL
+            document.getElementById('map_url_container').style.display = (table === 'attractions') ? 'block' : 'none';
+            
+            modal.show();
+        }
+
+        function editItem(table, data) {
+            document.getElementById('table_name').value = table;
+            document.getElementById('item_id').value = data.db_id;
+            document.getElementById('modalTitle').innerText = 'Edit Data';
+
+            document.getElementById('image_url').value = data.img;
+            if(table === 'attractions') document.getElementById('map_url').value = data.url || '';
+            document.getElementById('map_url_container').style.display = (table === 'attractions') ? 'block' : 'none';
+
+            // Mapping fields based on table type
+            // Mitra uses 'name' and 'desc', others use 'title' and 'desc'
+            // But my get functions return structured id/en/cn objects with consistent keys?
+            // Wait, db_supabase returns: id: {name, desc} for mitra. id: {title, desc} for others.
+            // Let's check db_supabase.py again.
+            // Mitra: name, desc. Wisata/Promo/Event: title, desc.
+            
+            const isMitra = (table === 'partners');
+            
+            document.getElementById('title_id').value = isMitra ? data.id.name : data.id.title;
+            document.getElementById('desc_id').value = data.id.desc;
+            
+            document.getElementById('title_en').value = isMitra ? data.en.name : data.en.title;
+            document.getElementById('desc_en').value = data.en.desc;
+            
+            document.getElementById('title_cn').value = isMitra ? data.cn.name : data.cn.title;
+            document.getElementById('desc_cn').value = data.cn.desc;
+
+            modal.show();
+        }
+
+        function deleteItem(table, id) {
+            if(!confirm('Yakin ingin menghapus data ini?')) return;
+            
+            fetch(`/api/delete/${table}/${id}`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') location.reload();
+                else alert('Gagal menghapus');
+            });
+        }
+
+        function saveData() {
+            const table = document.getElementById('table_name').value;
+            const id = document.getElementById('item_id').value;
+            const isEdit = !!id;
+            
+            const isMitra = (table === 'partners');
+            
+            // Construct payload based on table columns
+            // Mitra: name_id, desc_id, ...
+            // Others: title_id, desc_id, ...
+            
+            const payload = {
+                image_url: document.getElementById('image_url').value
+            };
+            
+            if(table === 'attractions') payload.map_url = document.getElementById('map_url').value;
+            
+            if(isMitra) {
+                payload.name_id = document.getElementById('title_id').value;
+                payload.desc_id = document.getElementById('desc_id').value;
+                payload.name_en = document.getElementById('title_en').value;
+                payload.desc_en = document.getElementById('desc_en').value;
+                payload.name_cn = document.getElementById('title_cn').value;
+                payload.desc_cn = document.getElementById('desc_cn').value;
+                // Fallback 'name' column for simplicity
+                payload.name = payload.name_id; 
+            } else {
+                payload.title_id = document.getElementById('title_id').value;
+                payload.desc_id = document.getElementById('desc_id').value;
+                payload.title_en = document.getElementById('title_en').value;
+                payload.desc_en = document.getElementById('desc_en').value;
+                payload.title_cn = document.getElementById('title_cn').value;
+                payload.desc_cn = document.getElementById('desc_cn').value;
+            }
+
+            const url = isEdit ? `/api/update/${table}/${id}` : `/api/create/${table}`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') location.reload();
+                else alert('Gagal menyimpan: ' + JSON.stringify(data));
+            });
+        }
+    </script>
+</body>
+</html>
