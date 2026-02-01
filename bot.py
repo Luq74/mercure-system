@@ -371,7 +371,7 @@ async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE)
         else:
             # Error database
             logging.error(f"Gagal menyimpan ke Supabase. Status: {status}")
-            await update.message.reply_text("Maaf, terjadi kesalahan sistem saat menyimpan voucher. Silakan coba lagi.", parse_mode='Markdown')
+            await update.message.reply_text(f"Maaf, terjadi kesalahan sistem saat menyimpan voucher.\n\nDetail Error: `{status}`\n\nSilakan lapor ke admin.", parse_mode='Markdown')
 
     except Exception as e:
         logging.error(f"Gagal memproses data voucher: {e}")

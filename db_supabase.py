@@ -116,7 +116,7 @@ def save_claim(user_id, user_name, mitra, promo, resi):
         return "success"
     except Exception as e:
         print(f"Error saving claim: {e}")
-        return "error"
+        return f"error: {str(e)}"
 
 def get_all_claims():
     """Mengambil semua data klaim voucher untuk laporan PDF"""
