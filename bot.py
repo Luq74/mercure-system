@@ -19,7 +19,7 @@ logging.basicConfig(
 
 # KONFIGURASI UTAMA
 # NOTE: Di Vercel, URL_BASE ini harus diganti dengan URL Vercel Anda (misal: https://mercure-bot.vercel.app)
-URL_BASE = "https://mercure-system.vercel.app"
+URL_BASE = "https://jaclyn-juglandaceous-camdyn.ngrok-free.dev"
 TOKEN = "8270937316:AAEEb1GUN_xeng84808iGBsMJrnBDwi_tpg"
 ID_STAFF = "784633296"  # ID Telegram Staff yang diizinkan
 
@@ -202,11 +202,13 @@ def api_upload():
 
 def get_main_keyboard(lang_code):
     t = lambda key: get_text(lang_code, key)
+    # Gunakan timestamp untuk cache busting agar WebApp selalu reload
+    ts = int(datetime.datetime.now().timestamp())
     kb = [
-        [KeyboardButton(t('btn_catalog'), web_app=WebAppInfo(url=f"{URL_BASE}/?lang={lang_code}"))],
-        [KeyboardButton(t('btn_wisata'), web_app=WebAppInfo(url=f"{URL_BASE}/wisata?lang={lang_code}")), 
-         KeyboardButton(t('btn_promo'), web_app=WebAppInfo(url=f"{URL_BASE}/promo?lang={lang_code}"))],
-        [KeyboardButton(t('btn_event'), web_app=WebAppInfo(url=f"{URL_BASE}/event?lang={lang_code}"))],
+        [KeyboardButton(t('btn_catalog'), web_app=WebAppInfo(url=f"{URL_BASE}/?lang={lang_code}&v={ts}"))],
+        [KeyboardButton(t('btn_wisata'), web_app=WebAppInfo(url=f"{URL_BASE}/wisata?lang={lang_code}&v={ts}")), 
+         KeyboardButton(t('btn_promo'), web_app=WebAppInfo(url=f"{URL_BASE}/promo?lang={lang_code}&v={ts}"))],
+        [KeyboardButton(t('btn_event'), web_app=WebAppInfo(url=f"{URL_BASE}/event?lang={lang_code}&v={ts}"))],
         [KeyboardButton(t('btn_shalat')), KeyboardButton(t('btn_lost_found'))],
         [KeyboardButton(t('btn_emergency')), KeyboardButton(FLAGS['id']), KeyboardButton(FLAGS['en']), KeyboardButton(FLAGS['cn'])]
     ]
@@ -296,22 +298,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         logging.info(f"Start command received from user {update.effective_user.id}")
         user_id = update.effective_user.id
-        if user_id not in user_languages:
-            user_languages[user_id] = 'id'
         
-        lang_code = user_languages[user_id]
+        # Di Vercel (Stateless), kita tidak bisa mengandalkan memori user_languages
+        # Jadi kita default ke 'id' jika tidak ada di memori, atau ambil dari database jika perlu (tapi lambat)
+        # Untuk performa terbaik di menu awal, kita default 'id' lalu user bisa ganti bahasa lewat tombol.
+        lang_code = user_languages.get(user_id, 'id')
+        
+        # Pastikan masuk memori (untuk sesi pendek ini)
+        user_languages[user_id] = lang_code
+        
         welcome = get_text(lang_code, 'welcome')
         
         # Debugging: Log before sending
-        logging.info(f"Sending welcome message with keyboard to {user_id}")
+        logging.info(f"Sending welcome message with keyboard to {user_id} (Lang: {lang_code})")
         
         await update.message.reply_text(welcome, parse_mode='Markdown', reply_markup=get_main_keyboard(lang_code))
         logging.info("Welcome message sent successfully")
     except Exception as e:
         logging.error(f"Error in start command: {e}", exc_info=True)
-        # Coba kirim pesan error fallback
+        # Fallback super aman jika get_text gagal
         try:
-            await update.message.reply_text("Maaf, sistem sedang memuat menu. Silakan ketik /start lagi dalam beberapa detik.")
+            await update.message.reply_text("Selamat datang! / Welcome! \nSilakan pilih menu di bawah:", reply_markup=get_main_keyboard('id'))
         except:
             pass
 
