@@ -277,28 +277,44 @@ async def post_init(application: Application):
     )
 
 # GLOBAL BOT APP (For Vercel)
-bot_app = Application.builder().token(TOKEN).post_init(post_init).build()
-bot_app.add_handler(CommandHandler("start", start))
-bot_app.add_handler(CommandHandler("ctk_lap_mitra", ctk_lap_mitra))
-bot_app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
-bot_app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_all_messages))
+# NOTE: Di environment serverless seperti Vercel, kita tidak bisa menggunakan global app 
+# yang persisten karena event loop akan di-reset setiap request.
+# Jadi kita buat factory function.
 
+def create_app():
+    return Application.builder().token(TOKEN).post_init(post_init).build()
+
+# Handler Webhook
 @app.route('/webhook', methods=['POST'])
 def webhook():
     """Endpoint untuk Vercel Webhook"""
     if request.method == "POST":
-        update = Update.de_json(request.get_json(force=True), bot_app.bot)
+        # Decode update tanpa bot dulu (karena bot ada di dalam async process)
+        # Atau gunakan temporary bot untuk decoding jika perlu, tapi de_json biasanya butuh bot untuk shortcut
+        # Kita buat app dulu
         
-        # Helper untuk menjalankan async dengan aman di Vercel
-        async def process():
-            await bot_app.initialize()
-            await bot_app.process_update(update)
-            await bot_app.shutdown()
-
-        # Gunakan new_event_loop untuk setiap request agar tidak konflik dengan loop global yang mungkin closed
+        # Gunakan new_event_loop untuk setiap request
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
+        
         try:
+            # Buat app baru yang terikat dengan loop ini
+            ptb_app = create_app()
+            
+            # Tambahkan handler (harus di-add setiap kali buat app baru)
+            ptb_app.add_handler(CommandHandler("start", start))
+            ptb_app.add_handler(CommandHandler("ctk_lap_mitra", ctk_lap_mitra))
+            ptb_app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
+            ptb_app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_all_messages))
+            
+            # Decode update
+            update = Update.de_json(request.get_json(force=True), ptb_app.bot)
+            
+            async def process():
+                await ptb_app.initialize()
+                await ptb_app.process_update(update)
+                await ptb_app.shutdown()
+            
             loop.run_until_complete(process())
         finally:
             loop.close()
@@ -314,13 +330,14 @@ def set_webhook():
         # Hapus trailing slash
         if url.endswith('/'): url = url[:-1]
         
-        async def set_hook():
-            await bot_app.bot.set_webhook(url + "/webhook")
-        
-        # Gunakan new_event_loop untuk memastikan eksekusi bersih
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
+            ptb_app = create_app()
+            async def set_hook():
+                await ptb_app.bot.set_webhook(url + "/webhook")
+                await ptb_app.shutdown()
+            
             loop.run_until_complete(set_hook())
         finally:
             loop.close()
@@ -334,8 +351,15 @@ def run_flask():
 if __name__ == '__main__':
     print(">>> LOADING BOT (LOCAL MODE) <<< ")
     
+    # Untuk local testing, kita bisa pakai polling biasa dengan satu app global
+    local_bot_app = create_app()
+    local_bot_app.add_handler(CommandHandler("start", start))
+    local_bot_app.add_handler(CommandHandler("ctk_lap_mitra", ctk_lap_mitra))
+    local_bot_app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
+    local_bot_app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_all_messages))
+    
     # Jalankan Flask di thread terpisah agar polling tidak terblokir
     threading.Thread(target=run_flask, daemon=True).start()
     
     print("Starting polling...")
-    bot_app.run_polling(drop_pending_updates=True)
+    local_bot_app.run_polling(drop_pending_updates=True)
