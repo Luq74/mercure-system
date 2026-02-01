@@ -405,13 +405,15 @@ async def post_init(application: Application):
 # Jadi kita buat factory function.
 
 def create_app():
-    return Application.builder().token(TOKEN).post_init(post_init).build()
+    # Hapus post_init dari sini agar tidak dipanggil setiap request (bikin lambat & rate limit)
+    return Application.builder().token(TOKEN).build()
 
 # Handler Webhook
 @app.route('/webhook', methods=['POST'])
 def webhook():
     """Endpoint untuk Vercel Webhook"""
     if request.method == "POST":
+        logging.info("Webhook received")
         # Decode update tanpa bot dulu (karena bot ada di dalam async process)
         # Atau gunakan temporary bot untuk decoding jika perlu, tapi de_json biasanya butuh bot untuk shortcut
         # Kita buat app dulu
@@ -431,7 +433,8 @@ def webhook():
             ptb_app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_all_messages))
             
             # Decode update
-            update = Update.de_json(request.get_json(force=True), ptb_app.bot)
+            req_json = request.get_json(force=True)
+            update = Update.de_json(req_json, ptb_app.bot)
             
             async def process():
                 await ptb_app.initialize()
@@ -439,6 +442,9 @@ def webhook():
                 await ptb_app.shutdown()
             
             loop.run_until_complete(process())
+        except Exception as e:
+            logging.error(f"Error in webhook: {e}", exc_info=True)
+            return "Error", 500
         finally:
             loop.close()
             
@@ -458,14 +464,25 @@ def set_webhook():
         try:
             ptb_app = create_app()
             async def set_hook():
+                # Set Webhook
                 await ptb_app.bot.set_webhook(url + "/webhook")
+                # Set Commands sekalian di sini (hanya sekali saat setup)
+                await ptb_app.bot.set_my_commands(
+                    [
+                        BotCommand("start", "Mulai Bot / Reset"),
+                        BotCommand("ctk_lap_mitra", "Cetak Laporan Mitra (PDF)")
+                    ],
+                    scope=BotCommandScopeChat(chat_id=ID_STAFF)
+                )
                 await ptb_app.shutdown()
             
             loop.run_until_complete(set_hook())
+        except Exception as e:
+            return f"Error setting webhook: {e}"
         finally:
             loop.close()
             
-        return f"Webhook set to: {url}/webhook"
+        return f"Webhook set to: {url}/webhook and Commands updated"
     return "Please provide ?url=YOUR_VERCEL_URL"
 
 def run_flask(): 
