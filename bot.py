@@ -58,6 +58,15 @@ FLAGS = {
 
 app = Flask(__name__)
 
+# Error Handler untuk Debugging di Vercel
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Pass through HTTP errors
+    if isinstance(e,  Exception):
+        logging.error(f"Server Error: {e}", exc_info=True)
+        return f"Internal Server Error: {str(e)}", 500
+    return f"Unknown Error", 500
+
 def get_text(lang_code, key, **kwargs):
     return TRANSLATIONS.get(lang_code, TRANSLATIONS['id']).get(key, key).format(**kwargs)
 
