@@ -49,20 +49,7 @@
             }
         };
 
-        const cardsData = [
-            {
-                img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600",
-                id: { title: "Nexa Spa Bliss", desc: "Nikmati diskon 15% untuk seluruh perawatan spa di hari kerja. Relaksasi sempurna di tengah kota Bandung." },
-                en: { title: "Nexa Spa Bliss", desc: "Enjoy 15% discount on all spa treatments on weekdays. Perfect relaxation in the heart of Bandung." },
-                cn: { title: "Nexa 水疗幸福", desc: "平日所有水疗护理均可享受 85 折优惠。 在万隆市中心享受完美的放松。" }
-            },
-            {
-                img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600",
-                id: { title: "Stay Longer, Save More", desc: "Dapatkan harga spesial untuk menginap minimal 3 malam. Sudah termasuk sarapan mewah untuk 2 orang." },
-                en: { title: "Stay Longer, Save More", desc: "Get special rates for a minimum stay of 3 nights. Includes luxury breakfast for 2 people." },
-                cn: { title: "住得越久，省得越多", desc: "至少入住 3 晚即可享受特价。 包含 2 人豪华早餐。" }
-            }
-        ];
+        const cardsData = {{ promos | tojson }};
 
         let currentLang = '{{ lang }}' || 'id';
 

@@ -77,68 +77,7 @@
             }
         };
 
-        const mitrasData = [
-            { 
-                img: "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=600",
-                id: { name: "Mie Gacoan Supratman", desc: "Diskon 10% All Menu" },
-                en: { name: "Mie Gacoan Supratman", desc: "10% Off All Menu" },
-                cn: { name: "Mie Gacoan Supratman", desc: "全场 9 折" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600",
-                id: { name: "Starbucks Dipatiukur", desc: "Buy 1 Get 1 Free Grande" },
-                en: { name: "Starbucks Dipatiukur", desc: "Buy 1 Get 1 Free Grande" },
-                cn: { name: "星巴克 Dipatiukur", desc: "大杯买一送一" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600",
-                id: { name: "Kartika Sari Dago", desc: "Potongan Rp 25.000" },
-                en: { name: "Kartika Sari Dago", desc: "IDR 25,000 Off" },
-                cn: { name: "Kartika Sari Dago", desc: "立减 25,000 印尼盾" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600",
-                id: { name: "Ambrogio Patisserie", desc: "Gratis 1 Dessert Pilihan" },
-                en: { name: "Ambrogio Patisserie", desc: "Free 1 Selected Dessert" },
-                cn: { name: "Ambrogio 甜品店", desc: "免费赠送 1 份精选甜点" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600",
-                id: { name: "Kopi Toko Djawa", desc: "Diskon Khusus 15%" },
-                en: { name: "Kopi Toko Djawa", desc: "Special 15% Discount" },
-                cn: { name: "Kopi Toko Djawa", desc: "特价 85 折" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=600",
-                id: { name: "Bakso Boedjangan", desc: "Gratis 1 Minuman Segar" },
-                en: { name: "Bakso Boedjangan", desc: "Free 1 Fresh Drink" },
-                cn: { name: "Bakso Boedjangan", desc: "免费赠送 1 杯饮料" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1603360946369-3974e4760c6b?w=600",
-                id: { name: "Sate Memori", desc: "Potongan Harga 10%" },
-                en: { name: "Sate Memori", desc: "10% Discount" },
-                cn: { name: "Sate Memori", desc: "9 折优惠" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1551404973-7bb668612f0e?w=600",
-                id: { name: "Prima Rasa Kemuning", desc: "Diskon 5% Picnic Roll" },
-                en: { name: "Prima Rasa Kemuning", desc: "5% Off Picnic Roll" },
-                cn: { name: "Prima Rasa Kemuning", desc: "Picnic Roll 95 折" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600",
-                id: { name: "Lawangwangi", desc: "Free Welcome Drink" },
-                en: { name: "Lawangwangi", desc: "Free Welcome Drink" },
-                cn: { name: "Lawangwangi", desc: "免费迎宾饮料" }
-            },
-            { 
-                img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600",
-                id: { name: "Warung Lela", desc: "Diskon 10% Khusus Tamu" },
-                en: { name: "Warung Lela", desc: "10% Guest Discount" },
-                cn: { name: "Warung Lela", desc: "住客专享 9 折" }
-            }
-        ];
+        const mitrasData = {{ mitras | tojson }};
 
         let currentLang = '{{ lang }}' || 'id';
 

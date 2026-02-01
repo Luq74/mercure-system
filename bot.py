@@ -194,13 +194,11 @@ async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE)
         
     user, waktu = update.effective_user, datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S')
     
+    # Simpan ke Supabase
     try:
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
-        c.execute("INSERT INTO voucher_claims (user_name, user_id, mitra, promo, resi, timestamp) VALUES (?, ?, ?, ?, ?, ?)",
-                  (user.first_name, str(user.id), mitra, promo, resi, waktu))
-        conn.commit()
-        conn.close()
+        success = db_supabase.save_claim(user.id, user.first_name, mitra, promo, resi)
+        if not success:
+            logging.error("Gagal menyimpan ke Supabase")
     except Exception as e:
         logging.error(f"Gagal menyimpan data voucher: {e}")
 

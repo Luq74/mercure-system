@@ -1,0 +1,5 @@
+sb_publishable_fswaWOXcENr45Ce-R6tkEQ_TreMgKue   Publishable key
+
+sb_secret_dJAJ_6YprqWs2lkyHGDTZw_Vc06mwjl   Secret keys
+
+https://wvizrrovgtpbohenruuz.supabase.co    URL

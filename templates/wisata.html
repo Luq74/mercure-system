@@ -50,29 +50,7 @@
             }
         };
 
-        const cardsData = [
-            {
-                img: "https://images.unsplash.com/photo-1626244665487-19409848f066?w=800",
-                url: "https://www.google.com/maps/dir/?api=1&origin=Mercure+Bandung+Nexa+Supratman&destination=Gedung+Sate+Bandung",
-                id: { title: "Gedung Sate", desc: "Ikon sejarah Kota Bandung dengan arsitektur klasik. Jarak tempuh sangat dekat dari hotel." },
-                en: { title: "Gedung Sate", desc: "Historical icon of Bandung with classic architecture. Very close distance from the hotel." },
-                cn: { title: "沙爹大厦 (Gedung Sate)", desc: "具有古典建筑风格的万隆历史地标。 距离酒店非常近。" }
-            },
-            {
-                img: "https://images.unsplash.com/photo-1582215443202-73a729352220?w=800",
-                url: "https://www.google.com/maps/dir/?api=1&origin=Mercure+Bandung+Nexa+Supratman&destination=Jalan+Braga+Bandung",
-                id: { title: "Kawasan Braga", desc: "Nikmati suasana Eropa klasik dengan deretan kafe legendaris dan galeri seni." },
-                en: { title: "Braga Street", desc: "Enjoy the classic European atmosphere with legendary cafes and art galleries." },
-                cn: { title: "布拉加街 (Braga Street)", desc: "享受拥有传奇咖啡馆和艺术画廊的古典欧洲氛围。" }
-            },
-            {
-                img: "https://images.unsplash.com/photo-1590564310418-66304f55a2c2?w=800",
-                url: "https://www.google.com/maps/dir/?api=1&origin=Mercure+Bandung+Nexa+Supratman&destination=Floating+Market+Lembang",
-                id: { title: "Floating Market", desc: "Wisata kuliner unik di atas perahu dengan udara sejuk khas Lembang." },
-                en: { title: "Floating Market", desc: "Unique culinary tour on boats with the cool air of Lembang." },
-                cn: { title: "水上市场 (Floating Market)", desc: "在船上享受独特的烹饪之旅，感受伦邦凉爽的空气。" }
-            }
-        ];
+        const cardsData = {{ wisata_list | tojson }};
 
         let currentLang = '{{ lang }}' || 'id';
 

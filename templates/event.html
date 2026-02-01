@@ -49,20 +49,7 @@
             }
         };
 
-        const cardsData = [
-            {
-                img: "https://images.unsplash.com/photo-1555244162-803834f70033?w=600",
-                id: { title: "Saturday BBQ Night", desc: "Bergabunglah bersama kami setiap Sabtu malam di Nexa Garden. Hidangan BBQ lezat dengan iringan live music." },
-                en: { title: "Saturday BBQ Night", desc: "Join us every Saturday night at Nexa Garden. Delicious BBQ dishes with live music accompaniment." },
-                cn: { title: "周六烧烤之夜", desc: "每周六晚加入我们在 Nexa 花园的聚会。 美味的烧烤菜肴伴随着现场音乐。" }
-            },
-            {
-                img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600",
-                id: { title: "Sunday Morning Yoga", desc: "Mulailah hari Minggu Anda dengan segar. Sesi Yoga bersama instruktur profesional di area taman hotel." },
-                en: { title: "Sunday Morning Yoga", desc: "Start your Sunday fresh. Yoga session with professional instructors in the hotel garden area." },
-                cn: { title: "周日晨间瑜伽", desc: "精神焕发地开始您的周日。 在酒店花园区由专业教练指导的瑜伽课程。" }
-            }
-        ];
+        const cardsData = {{ events | tojson }};
 
         let currentLang = '{{ lang }}' || 'id';
 
