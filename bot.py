@@ -287,22 +287,24 @@ bot_app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_all
 def webhook():
     """Endpoint untuk Vercel Webhook"""
     if request.method == "POST":
-        update = Update.de_json(request.get_json(force=True), bot_app.bot)
+        # Create a new event loop for this request
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         
-        # Helper untuk menjalankan async di sync Flask context
-        async def process():
-            await bot_app.initialize()
-            await bot_app.process_update(update)
-            await bot_app.shutdown()
-
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                loop.create_task(process())
-            else:
-                loop.run_until_complete(process())
-        except RuntimeError:
-            asyncio.run(process())
+            update = Update.de_json(request.get_json(force=True), bot_app.bot)
+            
+            async def process():
+                await bot_app.initialize()
+                await bot_app.process_update(update)
+                await bot_app.shutdown()
+            
+            loop.run_until_complete(process())
+        except Exception as e:
+            logging.error(f"Error in webhook: {e}", exc_info=True)
+            return "Error", 500
+        finally:
+            loop.close()
             
         return "OK"
     return "Invalid Request"
@@ -315,19 +317,25 @@ def set_webhook():
         # Hapus trailing slash
         if url.endswith('/'): url = url[:-1]
         
-        async def set_hook():
-            await bot_app.bot.set_webhook(url + "/webhook")
+        # Gunakan loop baru dan instance Bot langsung untuk menghindari konflik state
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         
         try:
-            asyncio.run(set_hook())
-        except RuntimeError:
-            # Jika loop sudah jalan (jarang terjadi di sini tapi buat jaga-jaga)
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+            from telegram import Bot
+            temp_bot = Bot(TOKEN)
+            
+            async def set_hook():
+                await temp_bot.set_webhook(url + "/webhook")
+            
             loop.run_until_complete(set_hook())
+            return f"Webhook set to: {url}/webhook"
+        except Exception as e:
+            logging.error(f"Failed to set webhook: {e}", exc_info=True)
+            return f"Error setting webhook: {e}", 500
+        finally:
             loop.close()
             
-        return f"Webhook set to: {url}/webhook"
     return "Please provide ?url=YOUR_VERCEL_URL"
 
 def run_flask(): 
