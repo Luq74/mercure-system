@@ -3,6 +3,7 @@ from flask import Flask, render_template, request
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand, BotCommandScopeChat
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from languages import TRANSLATIONS
+import db_supabase
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -22,7 +23,7 @@ URL_BASE = "https://mercure-system.vercel.app"
 TOKEN = "8270937316:AAEEb1GUN_xeng84808iGBsMJrnBDwi_tpg"
 ID_STAFF = "784633296"  # ID Telegram Staff yang diizinkan
 
-# Database Setup
+# Database Setup (Legacy SQLite for local testing or backup, but we use Supabase now)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_NAME = os.path.join(BASE_DIR, "mercure.db")
 
@@ -73,22 +74,26 @@ def get_text(lang_code, key, **kwargs):
 @app.route('/')
 def index(): 
     lang = request.args.get('lang', 'id')
-    return render_template('index.html', lang=lang)
+    mitras = db_supabase.get_mitras()
+    return render_template('index.html', lang=lang, mitras=mitras)
 
 @app.route('/wisata')
 def wisata(): 
     lang = request.args.get('lang', 'id')
-    return render_template('wisata.html', lang=lang)
+    wisata_list = db_supabase.get_wisata()
+    return render_template('wisata.html', lang=lang, wisata_list=wisata_list)
 
 @app.route('/promo')
 def promo(): 
     lang = request.args.get('lang', 'id')
-    return render_template('promo.html', lang=lang)
+    promos = db_supabase.get_promos()
+    return render_template('promo.html', lang=lang, promos=promos)
 
 @app.route('/event')
 def event(): 
     lang = request.args.get('lang', 'id')
-    return render_template('event.html', lang=lang)
+    events = db_supabase.get_events()
+    return render_template('event.html', lang=lang, events=events)
 
 def get_main_keyboard(lang_code):
     t = lambda key: get_text(lang_code, key)
