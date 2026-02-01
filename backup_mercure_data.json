@@ -1,0 +1,73 @@
+{
+  "partners": [
+    {
+      "id": 19,
+      "name": "Bolu Susu Lembang - Original",
+      "image_url": "https://wvizrrovgtpbohenruuz.supabase.co/storage/v1/object/public/images/uploads/20260201123800_1843_images%20(9).jpg",
+      "name_id": "Bolu Susu Lembang - Original",
+      "desc_id": "Promo 20%",
+      "name_en": " Lembang Milk Cake - Original",
+      "desc_en": "Promo 20%",
+      "name_cn": "伦邦牛奶蛋糕 - 原味",
+      "desc_cn": "Promo 20%",
+      "created_at": "2026-02-01T12:38:01.073842+00:00"
+    }
+  ],
+  "attractions": [
+    {
+      "id": 2,
+      "image_url": "https://wvizrrovgtpbohenruuz.supabase.co/storage/v1/object/public/images/uploads/20260201131448_9721_61b57486d6751842b5f3724ec244d7412ae02c9a036d11dc2a03f31c9d36d206.avif",
+      "map_url": "https://www.google.com/maps/search/Tur+Kawah+Putih,+Kebun+Teh,+Jembatan+Gantung+%26+Pemandian+Air+Panas/@-7.128593,107.3702151,13z/data=!3m1!4b1?entry=ttu&g_ep=EgoyMDI2MDEyOC4wIKXMDSoASAFQAw%3D%3D",
+      "title_id": "Tour Kawah Putih, Kebun Teh, Jembatan Gantung & Pemandian Air Panas",
+      "desc_id": "Promo 30%",
+      "title_en": "White Crater Tour, Tea Plantation, Suspension Bridge & Hot Springs",
+      "desc_en": "Promo 30%",
+      "title_cn": "白火山口之旅、茶园、吊桥和温泉",
+      "desc_cn": "Promo 30%",
+      "created_at": "2026-02-01T13:14:49.590125+00:00"
+    },
+    {
+      "id": 3,
+      "image_url": "https://wvizrrovgtpbohenruuz.supabase.co/storage/v1/object/public/images/uploads/20260201155006_9375_5fabf6158ce8a.jpg",
+      "map_url": "https://www.google.com/maps/place/Barusen+Hills/@-7.1182243,107.4971052,17z/data=!3m1!4b1!4m6!3m5!1s0x2e68929580bc8009:0x6c2cef269e5efaa5!8m2!3d-7.1182296!4d107.4996801!16s%2Fg%2F11c0qfrk99?entry=ttu&g_ep=EgoyMDI2MDEyOC4wIKXMDSoASAFQAw%3D%3D",
+      "title_id": "Barusen Hills Ciwidey",
+      "desc_id": "Promo 30%",
+      "title_en": "Barusen Hills Ciwidey",
+      "desc_en": "Promo 30%",
+      "title_cn": "Barusen Hills Ciwidey",
+      "desc_cn": "Promo 30%",
+      "created_at": "2026-02-01T15:50:08.093137+00:00"
+    }
+  ],
+  "hotel_promos": [],
+  "events": [],
+  "voucher_claims": [
+    {
+      "id": 1,
+      "user_id": "8489171304",
+      "user_name": "Lucky",
+      "mitra": "Bolu Susu Lembang - Original",
+      "promo": "Promo 20%",
+      "resi": "VCHR-20260201-4244",
+      "timestamp": "2026-02-01T13:06:43.920999+00:00"
+    },
+    {
+      "id": 2,
+      "user_id": "8489171304",
+      "user_name": "Lucky",
+      "mitra": "Bolu Susu Lembang - Original",
+      "promo": "Promo 20%",
+      "resi": "VCHR-20260201-4083",
+      "timestamp": "2026-02-01T13:07:49.68573+00:00"
+    },
+    {
+      "id": 3,
+      "user_id": "5648435157",
+      "user_name": "clouddssds",
+      "mitra": "Bolu Susu Lembang - Original",
+      "promo": "Promo 20%",
+      "resi": "VCHR-20260201-8734",
+      "timestamp": "2026-02-01T15:39:17.698985+00:00"
+    }
+  ]
+}

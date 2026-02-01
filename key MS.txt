@@ -1,0 +1,5 @@
+sb_publishable_1cU1AABoAp62RlyPthr0RA_FqdpMLGS  Publishable key
+
+sb_secret_HQWIdLC4KsNfR8x-N77E3w_BXFHYz5w  Secret keys
+
+ https://knwczfvzuykxybvyzunh.supabase.co  URL

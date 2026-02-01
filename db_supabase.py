@@ -1,9 +1,10 @@
 from supabase import create_client, Client
 import uuid
+import config
 
 # Konfigurasi Supabase
-SUPABASE_URL = "https://wvizrrovgtpbohenruuz.supabase.co"
-SUPABASE_KEY = "sb_publishable_fswaWOXcENr45Ce-R6tkEQ_TreMgKue" 
+SUPABASE_URL = config.SUPABASE_URL
+SUPABASE_KEY = config.SUPABASE_KEY
 
 try:
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
