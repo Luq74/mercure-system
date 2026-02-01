@@ -49,8 +49,8 @@ try:
 except Exception as e:
     logging.warning(f"Database init failed (normal on Vercel if read-only): {e}")
 
-# In-memory storage for user language preference
-user_languages = {}
+# In-memory storage for user language preference removed for stateless Vercel
+# user_languages = {}
 
 # Flags
 FLAGS = {
@@ -301,13 +301,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logging.info(f"Start command received from user {update.effective_user.id}")
         user_id = update.effective_user.id
         
-        # Di Vercel (Stateless), kita tidak bisa mengandalkan memori user_languages
-        # Jadi kita default ke 'id' jika tidak ada di memori, atau ambil dari database jika perlu (tapi lambat)
-        # Untuk performa terbaik di menu awal, kita default 'id' lalu user bisa ganti bahasa lewat tombol.
-        lang_code = user_languages.get(user_id, 'id')
-        
-        # Pastikan masuk memori (untuk sesi pendek ini)
-        user_languages[user_id] = lang_code
+        # Stateless: Default to 'id'
+        lang_code = 'id'
         
         welcome = get_text(lang_code, 'welcome')
         
@@ -338,7 +333,6 @@ async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE)
     try:
         status = db_supabase.save_claim(user.id, user.first_name, mitra, promo, resi)
         
-        user_languages[user.id] = webapp_lang
         lang_code = webapp_lang
 
         if status == "already_claimed":
@@ -388,34 +382,48 @@ async def handle_all_messages(update: Update, context: ContextTypes.DEFAULT_TYPE
     user_id = user.id
     
     if text == FLAGS['id']:
-        user_languages[user_id] = 'id'
         await update.message.reply_text(get_text('id', 'lang_selected'), reply_markup=get_main_keyboard('id'))
         return
     elif text == FLAGS['en']:
-        user_languages[user_id] = 'en'
         await update.message.reply_text(get_text('en', 'lang_selected'), reply_markup=get_main_keyboard('en'))
         return
     elif text == FLAGS['cn']:
-        user_languages[user_id] = 'cn'
         await update.message.reply_text(get_text('cn', 'lang_selected'), reply_markup=get_main_keyboard('cn'))
         return
 
-    lang_code = user_languages.get(user_id, 'id')
-    t = lambda key, **kwargs: get_text(lang_code, key, **kwargs)
+    # Stateless logic: Check button text against all languages
+    found_key = None
+    found_lang = 'id'
     
-    if text == t('btn_emergency'):
+    for lang in ['id', 'en', 'cn']:
+        if text == get_text(lang, 'btn_emergency'):
+            found_key = 'btn_emergency'
+            found_lang = lang
+            break
+        elif text == get_text(lang, 'btn_lost_found'):
+            found_key = 'btn_lost_found'
+            found_lang = lang
+            break
+        elif text == get_text(lang, 'btn_shalat'):
+            found_key = 'btn_shalat'
+            found_lang = lang
+            break
+
+    t = lambda key, **kwargs: get_text(found_lang, key, **kwargs)
+    
+    if found_key == 'btn_emergency':
         await context.bot.send_message(chat_id=ID_STAFF, 
                                        text=t('msg_emergency', name=user.first_name, id=user.id), 
                                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"Hubungi Tamu", url=f"tg://user?id={user.id}")]]))
         await update.message.reply_text(t('msg_emergency_reply'))
         
-    elif text == t('btn_lost_found'):
+    elif found_key == 'btn_lost_found':
         await context.bot.send_message(chat_id=ID_STAFF, 
                                        text=t('msg_lost_found', name=user.first_name, id=user.id), 
                                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"Chat Tamu", url=f"tg://user?id={user.id}")]]))
         await update.message.reply_text(t('msg_lost_found_reply'))
         
-    elif text == t('btn_shalat'):
+    elif found_key == 'btn_shalat':
         await update.message.reply_text(t('msg_shalat'))
         
     else:
