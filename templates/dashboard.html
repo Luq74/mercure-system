@@ -156,8 +156,11 @@
                         <input type="hidden" id="table_name">
                         
                         <div class="mb-3">
-                            <label class="form-label">Image URL</label>
-                            <input type="text" class="form-control" id="image_url" placeholder="https://...">
+                            <label class="form-label">Image</label>
+                            <input type="file" class="form-control" id="image_file" accept="image/*">
+                            <input type="hidden" id="image_url">
+                            <div id="image_preview" class="mt-2"></div>
+                            <small class="text-muted">Upload gambar baru atau biarkan kosong jika tidak ingin mengubah.</small>
                         </div>
                         
                         <div class="mb-3" id="map_url_container" style="display:none;">
@@ -217,6 +220,8 @@
         function openModal(table) {
             document.getElementById('dataForm').reset();
             document.getElementById('item_id').value = '';
+            document.getElementById('image_url').value = '';
+            document.getElementById('image_preview').innerHTML = '';
             document.getElementById('table_name').value = table;
             document.getElementById('modalTitle').innerText = 'Tambah Data Baru';
             

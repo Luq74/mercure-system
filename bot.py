@@ -108,21 +108,59 @@ def dashboard():
 
 @app.route('/api/create/<table_name>', methods=['POST'])
 def api_create(table_name):
-    """API untuk Create Record"""
-    data = request.json
-    result = db_supabase.create_record(table_name, data)
-    if result:
-        return jsonify({"status": "success", "data": result}), 200
-    return jsonify({"status": "error"}), 500
+    """API untuk Create Record dengan Upload Gambar"""
+    try:
+        data = request.form.to_dict()
+        
+        # Handle File Upload
+        if 'image_file' in request.files:
+            file = request.files['image_file']
+            if file.filename != '':
+                filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}_{file.filename}"
+                file_bytes = file.read()
+                public_url = db_supabase.upload_image(file_bytes, filename, file.content_type)
+                if public_url:
+                    data['image_url'] = public_url
+        
+        # Clean up empty fields if any (optional)
+        
+        result = db_supabase.create_record(table_name, data)
+        if result:
+            return jsonify({"status": "success", "data": result}), 200
+        return jsonify({"status": "error", "message": "Failed to create record"}), 500
+    except Exception as e:
+        logging.error(f"API Create Error: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/api/update/<table_name>/<id>', methods=['POST'])
 def api_update(table_name, id):
-    """API untuk Update Record"""
-    data = request.json
-    result = db_supabase.update_record(table_name, id, data)
-    if result:
-        return jsonify({"status": "success", "data": result}), 200
-    return jsonify({"status": "error"}), 500
+    """API untuk Update Record dengan Upload Gambar"""
+    try:
+        data = request.form.to_dict()
+        
+        # Handle File Upload
+        if 'image_file' in request.files:
+            file = request.files['image_file']
+            if file.filename != '':
+                filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}_{file.filename}"
+                file_bytes = file.read()
+                public_url = db_supabase.upload_image(file_bytes, filename, file.content_type)
+                if public_url:
+                    data['image_url'] = public_url
+        
+        # Jika user tidak upload gambar baru, jangan update field image_url (frontend harus handle ini, 
+        # tapi di sini kita terima form data. Jika image_url tidak dikirim, jangan dihapus dari DB?)
+        # Supabase update hanya field yang dikirim. Jadi aman.
+        # Tapi hati-hati, request.form.to_dict() akan mengambil semua input hidden.
+        # Pastikan di frontend input hidden image_url diisi URL lama, atau dihapus jika upload baru.
+        
+        result = db_supabase.update_record(table_name, id, data)
+        if result:
+            return jsonify({"status": "success", "data": result}), 200
+        return jsonify({"status": "error", "message": "Failed to update record"}), 500
+    except Exception as e:
+        logging.error(f"API Update Error: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/api/delete/<table_name>/<id>', methods=['POST', 'DELETE'])
 def api_delete(table_name, id):
@@ -131,6 +169,33 @@ def api_delete(table_name, id):
     if result:
         return jsonify({"status": "success"}), 200
     return jsonify({"status": "error"}), 500
+
+@app.route('/api/upload', methods=['POST'])
+def api_upload():
+    """API untuk Upload Image"""
+    if 'file' not in request.files:
+        return jsonify({"status": "error", "message": "No file part"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"status": "error", "message": "No selected file"}), 400
+
+    if file:
+        # Generate unique filename to avoid collision
+        import uuid
+        ext = file.filename.split('.')[-1]
+        filename = f"{uuid.uuid4()}.{ext}"
+        
+        # Read file content
+        file_content = file.read()
+        
+        # Upload to Supabase
+        public_url = db_supabase.upload_image(file_content, filename, file.content_type)
+        
+        if public_url:
+            return jsonify({"status": "success", "url": public_url}), 200
+        else:
+            return jsonify({"status": "error", "message": "Upload failed"}), 500
 
 # --- END DASHBOARD ROUTES ---
 

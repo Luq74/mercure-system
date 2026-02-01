@@ -145,3 +145,67 @@ def delete_record(table, id):
     except Exception as e:
         print(f"Error deleting record in {table} id {id}: {e}")
         return False
+
+def upload_image(file_bytes, file_name, content_type):
+    """Upload image to Supabase Storage"""
+    if not supabase: return None
+    try:
+        bucket_name = "images"
+        # Upload file
+        response = supabase.storage.from_(bucket_name).upload(
+            path=file_name,
+            file=file_bytes,
+            file_options={"content-type": content_type, "upsert": "true"}
+        )
+        
+        # Get Public URL
+        public_url = supabase.storage.from_(bucket_name).get_public_url(file_name)
+        return public_url
+    except Exception as e:
+        print(f"Error uploading image: {e}")
+        return None
+
+def upload_image(file_bytes, file_name, content_type):
+    """Upload image to Supabase Storage"""
+    if not supabase: return None
+    try:
+        # Generate unique filename
+        unique_name = f"{uuid.uuid4()}-{file_name}"
+        bucket_name = "images"
+        
+        # Upload
+        supabase.storage.from_(bucket_name).upload(
+            path=unique_name,
+            file=file_bytes,
+            file_options={"content-type": content_type}
+        )
+        
+        # Get Public URL
+        public_url = supabase.storage.from_(bucket_name).get_public_url(unique_name)
+        return public_url
+    except Exception as e:
+        print(f"Error uploading image: {e}")
+        return None
+
+def upload_image(file_bytes, filename, content_type):
+    """Upload image to Supabase Storage and return Public URL"""
+    if not supabase: return None
+    try:
+        bucket = 'images'
+        # Check if bucket exists? No easy way with py-client anon key usually. 
+        # Assume 'images' bucket exists and is public.
+        
+        # Upload
+        path = f"uploads/{filename}"
+        res = supabase.storage.from_(bucket).upload(
+            path=path,
+            file=file_bytes,
+            file_options={"content-type": content_type, "upsert": "true"}
+        )
+        
+        # Get Public URL
+        public_url = supabase.storage.from_(bucket).get_public_url(path)
+        return public_url
+    except Exception as e:
+        print(f"Error uploading image: {e}")
+        return None
