@@ -222,23 +222,30 @@ def generate_pdf_report(buffer):
     elements.append(Spacer(1, 0.2*inch))
 
     try:
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
-        c.execute("SELECT user_name, resi, timestamp, mitra, promo FROM voucher_claims ORDER BY id DESC")
-        data = c.fetchall()
-        conn.close()
+        claims = db_supabase.get_all_claims()
     except Exception as e:
         logging.error(f"Database error in PDF generation: {e}")
         elements.append(Paragraph(f"Error mengambil data database: {e}", styles['Normal']))
         doc.build(elements)
         return
 
-    if not data:
+    if not claims:
         elements.append(Paragraph("Belum ada data klaim voucher.", styles['Normal']))
     else:
         table_data = [['Nama Tamu', 'No. Resi', 'Waktu', 'Mitra', 'Promo']]
-        for row in data:
-            table_data.append([row[0], row[1], row[2], row[3], row[4]])
+        for row in claims:
+            # Format timestamp if needed, currently assuming string
+            ts = row.get('timestamp', '')
+            # Simple cleanup if it's ISO format
+            if 'T' in ts: ts = ts.split('T')[0] + ' ' + ts.split('T')[1][:8]
+            
+            table_data.append([
+                row.get('user_name', '-'), 
+                row.get('resi', '-'), 
+                ts, 
+                row.get('mitra', '-'), 
+                row.get('promo', '-')
+            ])
 
         col_widths = [1.0*inch, 1.3*inch, 1.3*inch, 1.5*inch, 1.2*inch] 
         

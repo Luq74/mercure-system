@@ -1,7 +1,7 @@
 from supabase import create_client, Client
+import uuid
 
 # Konfigurasi Supabase
-# NOTE: Idealnya ini ada di environment variables, tapi untuk kemudahan deployment awal kita taruh sini
 SUPABASE_URL = "https://wvizrrovgtpbohenruuz.supabase.co"
 SUPABASE_KEY = "sb_publishable_fswaWOXcENr45Ce-R6tkEQ_TreMgKue" 
 
@@ -15,11 +15,8 @@ def get_mitras():
     """Mengambil data mitra dari Supabase untuk ditampilkan di Katalog"""
     if not supabase: return []
     try:
-        # Mengambil semua kolom dari tabel 'partners'
         response = supabase.table('partners').select("*").execute()
         raw_data = response.data
-        
-        # Transform data agar sesuai format JS di frontend
         formatted_data = []
         for item in raw_data:
             formatted_data.append({
@@ -43,6 +40,7 @@ def get_wisata():
         formatted_data = []
         for item in raw_data:
             formatted_data.append({
+                "db_id": item.get('id'),
                 "img": item.get('image_url', ''),
                 "url": item.get('map_url', ''),
                 "id": { "title": item.get('title_id', ''), "desc": item.get('desc_id', '') },
@@ -59,7 +57,6 @@ def get_promos():
     if not supabase: return []
     try:
         response = supabase.table('hotel_promos').select("*").execute()
-        # Asumsi struktur sama dengan wisata (title/desc + img)
         raw_data = response.data
         formatted_data = []
         for item in raw_data:
@@ -80,7 +77,6 @@ def get_events():
     if not supabase: return []
     try:
         response = supabase.table('events').select("*").execute()
-        # Asumsi struktur sama dengan wisata
         raw_data = response.data
         formatted_data = []
         for item in raw_data:
@@ -114,6 +110,16 @@ def save_claim(user_id, user_name, mitra, promo, resi):
         print(f"Error saving claim: {e}")
         return False
 
+def get_all_claims():
+    """Mengambil semua data klaim voucher untuk laporan PDF"""
+    if not supabase: return []
+    try:
+        response = supabase.table('voucher_claims').select("*").order('timestamp', desc=True).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error fetching claims: {e}")
+        return []
+
 # --- CRUD Operations for Dashboard ---
 
 def create_record(table, data):
@@ -146,58 +152,15 @@ def delete_record(table, id):
         print(f"Error deleting record in {table} id {id}: {e}")
         return False
 
-def upload_image(file_bytes, file_name, content_type):
-    """Upload image to Supabase Storage"""
-    if not supabase: return None
-    try:
-        bucket_name = "images"
-        # Upload file
-        response = supabase.storage.from_(bucket_name).upload(
-            path=file_name,
-            file=file_bytes,
-            file_options={"content-type": content_type, "upsert": "true"}
-        )
-        
-        # Get Public URL
-        public_url = supabase.storage.from_(bucket_name).get_public_url(file_name)
-        return public_url
-    except Exception as e:
-        print(f"Error uploading image: {e}")
-        return None
-
-def upload_image(file_bytes, file_name, content_type):
-    """Upload image to Supabase Storage"""
-    if not supabase: return None
-    try:
-        # Generate unique filename
-        unique_name = f"{uuid.uuid4()}-{file_name}"
-        bucket_name = "images"
-        
-        # Upload
-        supabase.storage.from_(bucket_name).upload(
-            path=unique_name,
-            file=file_bytes,
-            file_options={"content-type": content_type}
-        )
-        
-        # Get Public URL
-        public_url = supabase.storage.from_(bucket_name).get_public_url(unique_name)
-        return public_url
-    except Exception as e:
-        print(f"Error uploading image: {e}")
-        return None
-
 def upload_image(file_bytes, filename, content_type):
     """Upload image to Supabase Storage and return Public URL"""
     if not supabase: return None
     try:
         bucket = 'images'
-        # Check if bucket exists? No easy way with py-client anon key usually. 
-        # Assume 'images' bucket exists and is public.
+        path = f"uploads/{filename}"
         
         # Upload
-        path = f"uploads/{filename}"
-        res = supabase.storage.from_(bucket).upload(
+        supabase.storage.from_(bucket).upload(
             path=path,
             file=file_bytes,
             file_options={"content-type": content_type, "upsert": "true"}

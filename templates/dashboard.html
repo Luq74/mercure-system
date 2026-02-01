@@ -279,45 +279,77 @@
             
             const isMitra = (table === 'partners');
             
-            // Construct payload based on table columns
-            // Mitra: name_id, desc_id, ...
-            // Others: title_id, desc_id, ...
+            // Gunakan FormData untuk support file upload
+            const formData = new FormData();
             
-            const payload = {
-                image_url: document.getElementById('image_url').value
-            };
-            
-            if(table === 'attractions') payload.map_url = document.getElementById('map_url').value;
-            
-            if(isMitra) {
-                payload.name_id = document.getElementById('title_id').value;
-                payload.desc_id = document.getElementById('desc_id').value;
-                payload.name_en = document.getElementById('title_en').value;
-                payload.desc_en = document.getElementById('desc_en').value;
-                payload.name_cn = document.getElementById('title_cn').value;
-                payload.desc_cn = document.getElementById('desc_cn').value;
-                // Fallback 'name' column for simplicity
-                payload.name = payload.name_id; 
+            // Handle Image File
+            const fileInput = document.getElementById('image_file');
+            if(fileInput.files.length > 0) {
+                formData.append('image_file', fileInput.files[0]);
             } else {
-                payload.title_id = document.getElementById('title_id').value;
-                payload.desc_id = document.getElementById('desc_id').value;
-                payload.title_en = document.getElementById('title_en').value;
-                payload.desc_en = document.getElementById('desc_en').value;
-                payload.title_cn = document.getElementById('title_cn').value;
-                payload.desc_cn = document.getElementById('desc_cn').value;
+                // Jika edit dan tidak ada file baru, kirim URL lama jika perlu
+                // Tapi backend logic: jika image_file ada, upload baru.
+                // Jika tidak, kita bisa kirim image_url lama agar tetap tersimpan jika backend overwrite full row?
+                // Supabase update hanya field yang dikirim. Tapi create butuh image_url.
+                // Kita kirim image_url dari hidden input
+                formData.append('image_url', document.getElementById('image_url').value);
+            }
+            
+            if(table === 'attractions') formData.append('map_url', document.getElementById('map_url').value);
+            
+            // Ambil value dari form
+            const title_id = document.getElementById('title_id').value;
+            const desc_id = document.getElementById('desc_id').value;
+            const title_en = document.getElementById('title_en').value;
+            const desc_en = document.getElementById('desc_en').value;
+            const title_cn = document.getElementById('title_cn').value;
+            const desc_cn = document.getElementById('desc_cn').value;
+
+            if(isMitra) {
+                formData.append('name_id', title_id);
+                formData.append('desc_id', desc_id);
+                formData.append('name_en', title_en);
+                formData.append('desc_en', desc_en);
+                formData.append('name_cn', title_cn);
+                formData.append('desc_cn', desc_cn);
+                // Fallback 'name' column
+                formData.append('name', title_id);
+            } else {
+                formData.append('title_id', title_id);
+                formData.append('desc_id', desc_id);
+                formData.append('title_en', title_en);
+                formData.append('desc_en', desc_en);
+                formData.append('title_cn', title_cn);
+                formData.append('desc_cn', desc_cn);
             }
 
             const url = isEdit ? `/api/update/${table}/${id}` : `/api/create/${table}`;
             
+            // Tampilkan loading state
+            const btnSimpan = document.querySelector('button[onclick="saveData()"]');
+            const originalText = btnSimpan.innerText;
+            btnSimpan.innerText = 'Menyimpan...';
+            btnSimpan.disabled = true;
+
             fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: formData 
+                // Jangan set Content-Type header manual saat pakai FormData, biar browser yang set boundary
             })
             .then(res => res.json())
             .then(data => {
-                if(data.status === 'success') location.reload();
-                else alert('Gagal menyimpan: ' + JSON.stringify(data));
+                if(data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Gagal menyimpan: ' + (data.message || JSON.stringify(data)));
+                    btnSimpan.innerText = originalText;
+                    btnSimpan.disabled = false;
+                }
+            })
+            .catch(err => {
+                alert('Terjadi kesalahan: ' + err);
+                btnSimpan.innerText = originalText;
+                btnSimpan.disabled = false;
             });
         }
     </script>
