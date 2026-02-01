@@ -17,10 +17,12 @@ logging.basicConfig(
     level=logging.INFO
 )
 
+import config
+
 # KONFIGURASI UTAMA
-# NOTE: Di Vercel, URL_BASE ini harus diganti dengan URL Vercel Anda (misal: https://mercure-bot.vercel.app)
-URL_BASE = "https://jaclyn-juglandaceous-camdyn.ngrok-free.dev"
-TOKEN = "8270937316:AAEEb1GUN_xeng84808iGBsMJrnBDwi_tpg"
+# URL BASE diambil dari config.py (sesuai Vercel)
+URL_BASE = config.VERCEL_URL
+TOKEN = config.BOT_TOKEN
 ID_STAFF = "784633296"  # ID Telegram Staff yang diizinkan
 
 # Database Setup (Legacy SQLite for local testing or backup, but we use Supabase now)
