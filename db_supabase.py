@@ -101,8 +101,8 @@ def save_claim(user_id, user_name, mitra, promo, resi):
             "user_name": user_name,
             "mitra": mitra,
             "promo": promo,
-            "resi": resi,
-            "timestamp": "now()"
+            "resi": resi
+            # "timestamp": "now()" -- Biarkan default DB yang mengisi
         }
         supabase.table('voucher_claims').insert(data).execute()
         return True
