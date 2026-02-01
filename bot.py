@@ -18,7 +18,7 @@ logging.basicConfig(
 
 # KONFIGURASI UTAMA
 # NOTE: Di Vercel, URL_BASE ini harus diganti dengan URL Vercel Anda (misal: https://mercure-bot.vercel.app)
-URL_BASE = "https://jaclyn-juglandaceous-camdyn.ngrok-free.dev"
+URL_BASE = "https://mercure-system.vercel.app"
 TOKEN = "8270937316:AAEEb1GUN_xeng84808iGBsMJrnBDwi_tpg"
 ID_STAFF = "784633296"  # ID Telegram Staff yang diizinkan
 
