@@ -93,9 +93,16 @@ def get_events():
         return []
 
 def save_claim(user_id, user_name, mitra, promo, resi):
-    """Menyimpan klaim voucher ke Supabase"""
-    if not supabase: return False
+    """Menyimpan klaim voucher ke Supabase dengan validasi 1 kali klaim per mitra"""
+    if not supabase: return "db_error"
     try:
+        # 1. Cek apakah user sudah pernah klaim di mitra ini
+        existing_claim = supabase.table('voucher_claims').select("id").eq('user_id', str(user_id)).eq('mitra', mitra).execute()
+        
+        if existing_claim.data and len(existing_claim.data) > 0:
+            return "already_claimed"
+
+        # 2. Jika belum, simpan data baru
         data = {
             "user_id": str(user_id),
             "user_name": user_name,
@@ -105,10 +112,10 @@ def save_claim(user_id, user_name, mitra, promo, resi):
             # "timestamp": "now()" -- Biarkan default DB yang mengisi
         }
         supabase.table('voucher_claims').insert(data).execute()
-        return True
+        return "success"
     except Exception as e:
         print(f"Error saving claim: {e}")
-        return False
+        return "error"
 
 def get_all_claims():
     """Mengambil semua data klaim voucher untuk laporan PDF"""

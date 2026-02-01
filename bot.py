@@ -327,39 +327,52 @@ async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     # Simpan ke Supabase
     try:
-        success = db_supabase.save_claim(user.id, user.first_name, mitra, promo, resi)
-        if not success:
-            logging.error("Gagal menyimpan ke Supabase")
-    except Exception as e:
-        logging.error(f"Gagal menyimpan data voucher: {e}")
+        status = db_supabase.save_claim(user.id, user.first_name, mitra, promo, resi)
+        
+        user_languages[user.id] = webapp_lang
+        lang_code = webapp_lang
 
-    user_languages[user.id] = webapp_lang
-    lang_code = webapp_lang
+        if status == "already_claimed":
+            # Jika sudah pernah klaim
+            msg_fail = get_text(lang_code, 'msg_voucher_fail', mitra=mitra)
+            await update.message.reply_text(msg_fail, parse_mode='Markdown')
+            logging.info(f"User {user.id} mencoba klaim ulang di {mitra} - Ditolak")
+            return  # Stop proses, jangan kirim notif ke staff
+            
+        elif status == "success":
+            # 1. Kirim Laporan ke Staff (Wrapped in try-except agar tidak memblokir respon ke user)
+            try:
+                laporan_staff = (
+                    f"🚨 **LAPORAN KLAIM VOUCHER BARU**\n"
+                    f"━━━━━━━━━━━━━━━━━━━━\n"
+                    f"📄 **No. Resi:** `{resi}`\n"
+                    f"📅 **Waktu:** {waktu}\n\n"
+                    f"👤 **Nama Tamu:** {user.first_name}\n"
+                    f"🆔 **ID Telegram:** `{user.id}`\n\n"
+                    f"🎫 **Mitra:** {mitra}\n"
+                    f"🎁 **Promo:** {promo}\n"
+                    f"━━━━━━━━━━━━━━━━━━━━"
+                )
+                await context.bot.send_message(chat_id=ID_STAFF, text=laporan_staff, parse_mode='Markdown',
+                                            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"Chat {user.first_name}", url=f"tg://user?id={user.id}")]]))
+            except Exception as e:
+                logging.error(f"Gagal mengirim notifikasi ke Staff ({ID_STAFF}): {e}")
 
-    # 1. Kirim Laporan ke Staff (Wrapped in try-except agar tidak memblokir respon ke user)
-    try:
-        laporan_staff = (
-            f"🚨 **LAPORAN KLAIM VOUCHER BARU**\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"📄 **No. Resi:** `{resi}`\n"
-            f"📅 **Waktu:** {waktu}\n\n"
-            f"👤 **Nama Tamu:** {user.first_name}\n"
-            f"🆔 **ID Telegram:** `{user.id}`\n\n"
-            f"🎫 **Mitra:** {mitra}\n"
-            f"🎁 **Promo:** {promo}\n"
-            f"━━━━━━━━━━━━━━━━━━━━"
-        )
-        await context.bot.send_message(chat_id=ID_STAFF, text=laporan_staff, parse_mode='Markdown',
-                                       reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"Chat {user.first_name}", url=f"tg://user?id={user.id}")]]))
-    except Exception as e:
-        logging.error(f"Gagal mengirim notifikasi ke Staff ({ID_STAFF}): {e}")
+            # 2. Kirim Konfirmasi ke User
+            try:
+                msg_success = get_text(lang_code, 'msg_voucher_success', mitra=mitra, promo=promo, resi=resi)
+                await update.message.reply_text(msg_success, parse_mode='Markdown')
+            except Exception as e:
+                logging.error(f"Gagal mengirim konfirmasi ke User ({user.id}): {e}")
+        
+        else:
+            # Error database
+            logging.error(f"Gagal menyimpan ke Supabase. Status: {status}")
+            await update.message.reply_text("Maaf, terjadi kesalahan sistem saat menyimpan voucher. Silakan coba lagi.", parse_mode='Markdown')
 
-    # 2. Kirim Konfirmasi ke User
-    try:
-        msg_success = get_text(lang_code, 'msg_voucher_success', mitra=mitra, promo=promo, resi=resi)
-        await update.message.reply_text(msg_success, parse_mode='Markdown')
     except Exception as e:
-        logging.error(f"Gagal mengirim konfirmasi ke User ({user.id}): {e}")
+        logging.error(f"Gagal memproses data voucher: {e}")
+        await update.message.reply_text("Maaf, terjadi kesalahan. Silakan coba lagi.", parse_mode='Markdown')
 
 async def handle_all_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text, user = update.message.text, update.effective_user

@@ -16,6 +16,7 @@ TRANSLATIONS = {
         'msg_shalat': "🕌 **JADWAL SHALAT KOTA BANDUNG**\n━━━━━━━━━━━━━━━━━━━━\nSubuh: 04:15\nDzuhur: 11:58\nAshar: 15:22\nMaghrib: 18:14\nIsya: 19:28",
         'msg_default_reply': "✅ Pesan Anda telah kami terima, terima kasih.",
         'msg_voucher_success': "✅ **Voucher {mitra} Berhasil!**\n\n🎁 **Promo:** {promo}\n📑 **No. Resi:** `{resi}`\n━━━━━━━━━━━━━━━━━━━━\n**Mercure Hotels Bandung Nexa Supratman**\n\nSelamat anda sudah klaim Voucher kepada Mitra Kami. Terimakasih. Voucher berlaku 24 jam.",
+        'msg_voucher_fail': "⚠️ **Klaim Voucher Gagal**\n\nAnda sudah pernah mengklaim voucher untuk **{mitra}** sebelumnya.\n\nSetiap tamu hanya diperbolehkan klaim 1 kali per mitra. Terimakasih.",
         'lang_selected': "Bahasa telah diubah ke Bahasa Indonesia 🇮🇩"
     },
     'en': {
@@ -34,6 +35,7 @@ TRANSLATIONS = {
         'msg_shalat': "🕌 **BANDUNG PRAYER TIMES**\n━━━━━━━━━━━━━━━━━━━━\nFajr: 04:15\nDhuhr: 11:58\nAsr: 15:22\nMaghrib: 18:14\nIsha: 19:28",
         'msg_default_reply': "✅ We have received your message, thank you.",
         'msg_voucher_success': "✅ **Voucher {mitra} Successful!**\n\n🎁 **Promo:** {promo}\n📑 **Receipt No:** `{resi}`\n━━━━━━━━━━━━━━━━━━━━\n**Mercure Hotels Bandung Nexa Supratman**\n\nCongratulations, you have claimed a Voucher for our Partner. Thank you. Voucher valid for 24 hours.",
+        'msg_voucher_fail': "⚠️ **Voucher Claim Failed**\n\nYou have already claimed a voucher for **{mitra}**.\n\nEach guest is allowed only 1 claim per partner. Thank you.",
         'lang_selected': "Language changed to English 🇬🇧"
     },
     'cn': {
@@ -52,6 +54,7 @@ TRANSLATIONS = {
         'msg_shalat': "🕌 **万隆祈祷时间**\n━━━━━━━━━━━━━━━━━━━━\n晨礼: 04:15\n晌礼: 11:58\n晡礼: 15:22\n昏礼: 18:14\n宵礼: 19:28",
         'msg_default_reply': "✅ 我们已收到您的信息，谢谢。",
         'msg_voucher_success': "✅ **优惠券 {mitra} 成功！**\n\n🎁 **促销:** {promo}\n📑 **收据号:** `{resi}`\n━━━━━━━━━━━━━━━━━━━━\n**万隆美爵酒店 NEXA SUPRATMAN**\n\n恭喜您，您已领取我们合作伙伴的优惠券。谢谢。优惠券有效期为 24 小时。",
+        'msg_voucher_fail': "⚠️ **领取优惠券失败**\n\n您之前已领取过 **{mitra}** 的优惠券。\n\n每位客人每个合作伙伴仅限领取 1 次。谢谢。",
         'lang_selected': "语言已更改为中文 🇨🇳"
     }
 }
