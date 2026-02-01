@@ -1,6 +1,6 @@
 import threading, datetime, random, logging, sqlite3, os, io, asyncio
 from flask import Flask, render_template, request, jsonify
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand, BotCommandScopeChat
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand, BotCommandScopeChat, MenuButtonDefault
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from languages import TRANSLATIONS
 import db_supabase
