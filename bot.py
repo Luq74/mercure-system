@@ -293,13 +293,27 @@ async def ctk_lap_mitra(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"❌ Gagal membuat laporan: {str(e)}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    if user_id not in user_languages:
-        user_languages[user_id] = 'id'
-    
-    lang_code = user_languages[user_id]
-    welcome = get_text(lang_code, 'welcome')
-    await update.message.reply_text(welcome, parse_mode='Markdown', reply_markup=get_main_keyboard(lang_code))
+    try:
+        logging.info(f"Start command received from user {update.effective_user.id}")
+        user_id = update.effective_user.id
+        if user_id not in user_languages:
+            user_languages[user_id] = 'id'
+        
+        lang_code = user_languages[user_id]
+        welcome = get_text(lang_code, 'welcome')
+        
+        # Debugging: Log before sending
+        logging.info(f"Sending welcome message with keyboard to {user_id}")
+        
+        await update.message.reply_text(welcome, parse_mode='Markdown', reply_markup=get_main_keyboard(lang_code))
+        logging.info("Welcome message sent successfully")
+    except Exception as e:
+        logging.error(f"Error in start command: {e}", exc_info=True)
+        # Coba kirim pesan error fallback
+        try:
+            await update.message.reply_text("Maaf, sistem sedang memuat menu. Silakan ketik /start lagi dalam beberapa detik.")
+        except:
+            pass
 
 async def handle_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = update.effective_message.web_app_data.data.split('|')
@@ -408,21 +422,35 @@ def create_app():
     # Hapus post_init dari sini agar tidak dipanggil setiap request (bikin lambat & rate limit)
     return Application.builder().token(TOKEN).build()
 
+@app.after_request
+def add_header(response):
+    """Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes."""
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 # Handler Webhook
 @app.route('/webhook', methods=['POST'])
 def webhook():
     """Endpoint untuk Vercel Webhook"""
     if request.method == "POST":
-        logging.info("Webhook received")
-        # Decode update tanpa bot dulu (karena bot ada di dalam async process)
-        # Atau gunakan temporary bot untuk decoding jika perlu, tapi de_json biasanya butuh bot untuk shortcut
-        # Kita buat app dulu
+        # Log request headers/body size untuk debug
+        logging.info(f"Webhook received. Content-Length: {request.content_length}")
         
         # Gunakan new_event_loop untuk setiap request
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         
         try:
+            # Decode update
+            try:
+                req_json = request.get_json(force=True)
+            except Exception as json_e:
+                logging.error(f"Error decoding JSON: {json_e}")
+                return "Invalid JSON", 400
+
             # Buat app baru yang terikat dengan loop ini
             ptb_app = create_app()
             
@@ -432,18 +460,21 @@ def webhook():
             ptb_app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
             ptb_app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_all_messages))
             
-            # Decode update
-            req_json = request.get_json(force=True)
+            # Parse update
             update = Update.de_json(req_json, ptb_app.bot)
             
             async def process():
-                await ptb_app.initialize()
-                await ptb_app.process_update(update)
-                await ptb_app.shutdown()
+                try:
+                    await ptb_app.initialize()
+                    await ptb_app.process_update(update)
+                    await ptb_app.shutdown()
+                except Exception as proc_e:
+                    logging.error(f"Error processing update: {proc_e}", exc_info=True)
             
             loop.run_until_complete(process())
+            logging.info("Webhook processed successfully")
         except Exception as e:
-            logging.error(f"Error in webhook: {e}", exc_info=True)
+            logging.error(f"Error in webhook outer loop: {e}", exc_info=True)
             return "Error", 500
         finally:
             loop.close()
