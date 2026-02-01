@@ -1,0 +1,57 @@
+# Dictionary untuk terjemahan
+TRANSLATIONS = {
+    'id': {
+        'welcome': "🏨 **MERCURE BANDUNG NEXA SUPRATMAN**\n🤖 **DIGITAL CONCIERGE SERVICE**",
+        'btn_catalog': "✨ KATALOG MITRA (PROMO)",
+        'btn_wisata': "🗺️ INFO WISATA",
+        'btn_promo': "📢 PROMO HOTEL",
+        'btn_event': "📅 EVENT & ACARA",
+        'btn_shalat': "🕌 JADWAL SHALAT",
+        'btn_lost_found': "🔍 LOST & FOUND",
+        'btn_emergency': "🆘 EMERGENCY / STAFF CARE",
+        'msg_emergency': "🔔 **NOTIFIKASI EMERGENCY**\n━━━━━━━━━━━━━━━━━━━━\n👤 **Tamu:** {name}\n🆔 **ID:** `{id}`",
+        'msg_emergency_reply': "Silahkan sampaikan keluhan anda, kami siap membantu anda. Terimakasih",
+        'msg_lost_found': "🔍 **INQUIRY LOST & FOUND**\n━━━━━━━━━━━━━━━━━━━━\n👤 **Tamu:** {name}\n🆔 **ID:** `{id}`",
+        'msg_lost_found_reply': "Silahkan sampaikan pesan anda, kami siap membantu anda. Terimakasih",
+        'msg_shalat': "🕌 **JADWAL SHALAT KOTA BANDUNG**\n━━━━━━━━━━━━━━━━━━━━\nSubuh: 04:15\nDzuhur: 11:58\nAshar: 15:22\nMaghrib: 18:14\nIsya: 19:28",
+        'msg_default_reply': "✅ Pesan Anda telah kami terima, terima kasih.",
+        'msg_voucher_success': "✅ **Voucher {mitra} Berhasil!**\n\n🎁 **Promo:** {promo}\n📑 **No. Resi:** `{resi}`\n━━━━━━━━━━━━━━━━━━━━\n**Mercure Hotels Bandung Nexa Supratman**\n\nSelamat anda sudah klaim Voucher kepada Mitra Kami. Terimakasih. Voucher berlaku 24 jam.",
+        'lang_selected': "Bahasa telah diubah ke Bahasa Indonesia 🇮🇩"
+    },
+    'en': {
+        'welcome': "🏨 **MERCURE BANDUNG NEXA SUPRATMAN**\n🤖 **DIGITAL CONCIERGE SERVICE**",
+        'btn_catalog': "✨ PARTNER CATALOG (PROMO)",
+        'btn_wisata': "🗺️ TOURISM INFO",
+        'btn_promo': "📢 HOTEL PROMO",
+        'btn_event': "📅 EVENTS",
+        'btn_shalat': "🕌 PRAYER TIMES",
+        'btn_lost_found': "🔍 LOST & FOUND",
+        'btn_emergency': "🆘 EMERGENCY / STAFF CARE",
+        'msg_emergency': "🔔 **EMERGENCY NOTIFICATION**\n━━━━━━━━━━━━━━━━━━━━\n👤 **Guest:** {name}\n🆔 **ID:** `{id}`",
+        'msg_emergency_reply': "Please state your emergency, we are ready to assist you. Thank you.",
+        'msg_lost_found': "🔍 **LOST & FOUND INQUIRY**\n━━━━━━━━━━━━━━━━━━━━\n👤 **Guest:** {name}\n🆔 **ID:** `{id}`",
+        'msg_lost_found_reply': "Please send your message, we are ready to assist you. Thank you.",
+        'msg_shalat': "🕌 **BANDUNG PRAYER TIMES**\n━━━━━━━━━━━━━━━━━━━━\nFajr: 04:15\nDhuhr: 11:58\nAsr: 15:22\nMaghrib: 18:14\nIsha: 19:28",
+        'msg_default_reply': "✅ We have received your message, thank you.",
+        'msg_voucher_success': "✅ **Voucher {mitra} Successful!**\n\n🎁 **Promo:** {promo}\n📑 **Receipt No:** `{resi}`\n━━━━━━━━━━━━━━━━━━━━\n**Mercure Hotels Bandung Nexa Supratman**\n\nCongratulations, you have claimed a Voucher for our Partner. Thank you. Voucher valid for 24 hours.",
+        'lang_selected': "Language changed to English 🇬🇧"
+    },
+    'cn': {
+        'welcome': "🏨 **万隆美爵酒店 NEXA SUPRATMAN**\n🤖 **数字礼宾服务**",
+        'btn_catalog': "✨ 合作伙伴目录（促销）",
+        'btn_wisata': "🗺️ 旅游信息",
+        'btn_promo': "📢 酒店促销",
+        'btn_event': "📅 活动",
+        'btn_shalat': "🕌 祈祷时间",
+        'btn_lost_found': "🔍 失物招领",
+        'btn_emergency': "🆘 紧急情况 / 员工关怀",
+        'msg_emergency': "🔔 **紧急通知**\n━━━━━━━━━━━━━━━━━━━━\n👤 **客人:** {name}\n🆔 **ID:** `{id}`",
+        'msg_emergency_reply': "请说明您的紧急情况，我们随时为您提供帮助。谢谢。",
+        'msg_lost_found': "🔍 **失物招领查询**\n━━━━━━━━━━━━━━━━━━━━\n👤 **客人:** {name}\n🆔 **ID:** `{id}`",
+        'msg_lost_found_reply': "请发送您的信息，我们随时为您提供帮助。谢谢。",
+        'msg_shalat': "🕌 **万隆祈祷时间**\n━━━━━━━━━━━━━━━━━━━━\n晨礼: 04:15\n晌礼: 11:58\n晡礼: 15:22\n昏礼: 18:14\n宵礼: 19:28",
+        'msg_default_reply': "✅ 我们已收到您的信息，谢谢。",
+        'msg_voucher_success': "✅ **优惠券 {mitra} 成功！**\n\n🎁 **促销:** {promo}\n📑 **收据号:** `{resi}`\n━━━━━━━━━━━━━━━━━━━━\n**万隆美爵酒店 NEXA SUPRATMAN**\n\n恭喜您，您已领取我们合作伙伴的优惠券。谢谢。优惠券有效期为 24 小时。",
+        'lang_selected': "语言已更改为中文 🇨🇳"
+    }
+}

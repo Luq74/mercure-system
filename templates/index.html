@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; color: #1a1a1a; margin: 0; padding: 15px; text-align: center; }
+        .header-gold { background: #1a1a1a; color: #d4af37; padding: 20px; border: 2px solid #d4af37; border-radius: 12px; margin-bottom: 25px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9em; position: relative; }
+        .lang-switch { margin-top: 10px; display: flex; justify-content: center; gap: 10px; }
+        .lang-btn { cursor: pointer; font-size: 1.5em; background: none; border: none; filter: grayscale(100%); transition: 0.3s; }
+        .lang-btn.active, .lang-btn:hover { filter: grayscale(0%); transform: scale(1.2); }
+        .card { background: #ffffff; border-radius: 20px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); margin-bottom: 25px; border: 1px solid #eee; text-align: left; }
+        .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
+        h3 { color: #d4af37; margin: 0 0 8px 0; font-size: 1.2em; border-left: 4px solid #d4af37; padding-left: 10px; }
+        p { color: #666; font-size: 0.95em; line-height: 1.5; margin-bottom: 15px; }
+        .btn { background: #1a1a1a; color: #d4af37; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; cursor: pointer; border: 2px solid #d4af37; width: 100%; display: block; }
+        #voucherModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
+        .voucher-box { background: white; width: 85%; max-width: 350px; border-radius: 25px; overflow: hidden; border: 3px solid #d4af37; text-align: center; }
+        .v-hotel { background: #1a1a1a; color: #d4af37; padding: 10px; font-size: 0.7em; letter-spacing: 1px; }
+        .v-header { background: #d4af37; color: #1a1a1a; padding: 10px; font-weight: bold; font-size: 1em; }
+        .v-body { padding: 20px; }
+        .v-promo { color: #cc0000; font-weight: bold; font-size: 1.1em; margin: 10px 0; border: 1px solid #f0f0f0; padding: 10px; border-radius: 10px; }
+        .v-resi { font-family: 'Courier New', monospace; font-size: 1.5em; font-weight: bold; margin: 15px 0; background: #f9f9f9; padding: 10px; border: 2px dashed #d4af37; }
+        .v-close { background: #1a1a1a; color: #d4af37; padding: 18px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="header-gold">
+        <span id="txt-header">Katalog Mitra Mercure Hotels Bandung Nexa Supratman</span>
+        <div class="lang-switch">
+            <button class="lang-btn" onclick="setLang('id')" id="btn-id">🇮🇩</button>
+            <button class="lang-btn" onclick="setLang('en')" id="btn-en">🇬🇧</button>
+            <button class="lang-btn" onclick="setLang('cn')" id="btn-cn">🇨🇳</button>
+        </div>
+    </div>
+    <div id="mitra-container"></div>
+    <div id="voucherModal">
+        <div class="voucher-box">
+            <div class="v-hotel">MERCURE HOTELS BANDUNG NEXA SUPRATMAN</div>
+            <div class="v-header">EXCLUSIVE DISCOUNT VOUCHER</div>
+            <div class="v-body">
+                <p style="margin:0; font-size: 0.8em; color: #888;" id="txt-merchant">MERCHANT:</p>
+                <h2 id="v-name" style="margin: 5px 0; color: #1a1a1a; font-size: 1.3em;">-</h2>
+                <div class="v-promo" id="v-promo">-</div>
+                <div class="v-resi" id="v-resi">-</div>
+                <p style="font-size: 0.7em; color: #888;" id="txt-valid">🕒 Berlaku 24 jam setelah diklaim</p>
+            </div>
+            <div class="v-close" onclick="confirmVoucher()" id="txt-confirm">KONFIRMASI & KIRIM</div>
+        </div>
+    </div>
+    <script>
+        const tg = window.Telegram.WebApp; tg.expand();
+        let currentMitra = "", currentResi = "", currentPromo = "";
+        
+        // Translations
+        const texts = {
+            'id': {
+                header: "Katalog Mitra Mercure Hotels Bandung Nexa Supratman",
+                btn_get: "AMBIL VOUCHER",
+                merchant: "MITRA:",
+                valid: "🕒 Berlaku 24 jam setelah diklaim",
+                confirm: "KONFIRMASI & KIRIM"
+            },
+            'en': {
+                header: "Mercure Bandung Nexa Supratman Partner Catalog",
+                btn_get: "GET VOUCHER",
+                merchant: "MERCHANT:",
+                valid: "🕒 Valid for 24 hours after claim",
+                confirm: "CONFIRM & SEND"
+            },
+            'cn': {
+                header: "万隆美爵酒店 Nexa Supratman 合作伙伴目录",
+                btn_get: "领取优惠券",
+                merchant: "商家:",
+                valid: "🕒 领取后24小时内有效",
+                confirm: "确认并发送"
+            }
+        };
+
+        const mitrasData = [
+            { 
+                img: "https://images.unsplash.com/photo-1585238342024-78d387f4a707?w=600",
+                id: { name: "Mie Gacoan Supratman", desc: "Diskon 10% All Menu" },
+                en: { name: "Mie Gacoan Supratman", desc: "10% Off All Menu" },
+                cn: { name: "Mie Gacoan Supratman", desc: "全场 9 折" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600",
+                id: { name: "Starbucks Dipatiukur", desc: "Buy 1 Get 1 Free Grande" },
+                en: { name: "Starbucks Dipatiukur", desc: "Buy 1 Get 1 Free Grande" },
+                cn: { name: "星巴克 Dipatiukur", desc: "大杯买一送一" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600",
+                id: { name: "Kartika Sari Dago", desc: "Potongan Rp 25.000" },
+                en: { name: "Kartika Sari Dago", desc: "IDR 25,000 Off" },
+                cn: { name: "Kartika Sari Dago", desc: "立减 25,000 印尼盾" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600",
+                id: { name: "Ambrogio Patisserie", desc: "Gratis 1 Dessert Pilihan" },
+                en: { name: "Ambrogio Patisserie", desc: "Free 1 Selected Dessert" },
+                cn: { name: "Ambrogio 甜品店", desc: "免费赠送 1 份精选甜点" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600",
+                id: { name: "Kopi Toko Djawa", desc: "Diskon Khusus 15%" },
+                en: { name: "Kopi Toko Djawa", desc: "Special 15% Discount" },
+                cn: { name: "Kopi Toko Djawa", desc: "特价 85 折" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=600",
+                id: { name: "Bakso Boedjangan", desc: "Gratis 1 Minuman Segar" },
+                en: { name: "Bakso Boedjangan", desc: "Free 1 Fresh Drink" },
+                cn: { name: "Bakso Boedjangan", desc: "免费赠送 1 杯饮料" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1603360946369-3974e4760c6b?w=600",
+                id: { name: "Sate Memori", desc: "Potongan Harga 10%" },
+                en: { name: "Sate Memori", desc: "10% Discount" },
+                cn: { name: "Sate Memori", desc: "9 折优惠" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1551404973-7bb668612f0e?w=600",
+                id: { name: "Prima Rasa Kemuning", desc: "Diskon 5% Picnic Roll" },
+                en: { name: "Prima Rasa Kemuning", desc: "5% Off Picnic Roll" },
+                cn: { name: "Prima Rasa Kemuning", desc: "Picnic Roll 95 折" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600",
+                id: { name: "Lawangwangi", desc: "Free Welcome Drink" },
+                en: { name: "Lawangwangi", desc: "Free Welcome Drink" },
+                cn: { name: "Lawangwangi", desc: "免费迎宾饮料" }
+            },
+            { 
+                img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600",
+                id: { name: "Warung Lela", desc: "Diskon 10% Khusus Tamu" },
+                en: { name: "Warung Lela", desc: "10% Guest Discount" },
+                cn: { name: "Warung Lela", desc: "住客专享 9 折" }
+            }
+        ];
+
+        let currentLang = '{{ lang }}' || 'id';
+
+        function setLang(lang) {
+            currentLang = lang;
+            
+            // Update UI buttons
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            // Update Static Texts
+            document.getElementById('txt-header').innerText = texts[lang].header;
+            document.getElementById('txt-merchant').innerText = texts[lang].merchant;
+            document.getElementById('txt-valid').innerText = texts[lang].valid;
+            document.getElementById('txt-confirm').innerText = texts[lang].confirm;
+
+            // Render List
+            const container = document.getElementById('mitra-container');
+            container.innerHTML = '';
+            mitrasData.forEach(m => {
+                const data = m[lang];
+                container.innerHTML += `<div class="card"><img src="${m.img}"><h3>${data.name}</h3><p>${data.desc}</p><button class="btn" onclick="showVoucher('${data.name}', '${data.desc}')">${texts[lang].btn_get}</button></div>`;
+            });
+        }
+
+        // Initialize
+        setLang(currentLang);
+
+        function showVoucher(mitra, promo) {
+            currentMitra = mitra; currentPromo = promo;
+            currentResi = "VCHR-" + new Date().toISOString().slice(0,10).replace(/-/g,"") + "-" + Math.floor(Math.random()*9000+1000);
+            document.getElementById('v-name').innerText = mitra;
+            document.getElementById('v-promo').innerText = promo;
+            document.getElementById('v-resi').innerText = currentResi;
+            document.getElementById('voucherModal').style.display = 'flex';
+        }
+        function confirmVoucher() {
+            tg.sendData(currentMitra + "|" + currentResi + "|" + currentPromo + "|" + currentLang);
+            document.getElementById('voucherModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

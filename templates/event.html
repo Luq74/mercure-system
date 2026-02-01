@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #fdfdfd; color: #1a1a1a; margin: 0; padding: 15px; text-align: center; }
+        .header { background: #1a1a1a; color: #d4af37; padding: 25px; border: 2px solid #d4af37; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; }
+        .header h2 { margin: 0; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; }
+        .lang-switch { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
+        .lang-btn { cursor: pointer; font-size: 1.5em; background: none; border: none; filter: grayscale(100%); transition: 0.3s; }
+        .lang-btn.active, .lang-btn:hover { filter: grayscale(0%); transform: scale(1.2); }
+        .grid-container { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; text-align: left; }
+        .card img { width: 100%; height: 220px; object-fit: cover; }
+        .card-content { padding: 20px; }
+        h3 { color: #d4af37; margin: 0 0 12px 0; font-size: 1.4em; border-left: 5px solid #d4af37; padding-left: 12px; }
+        p { color: #555; font-size: 1em; line-height: 1.6; margin-bottom: 25px; height: auto; }
+        footer { margin-top: 40px; font-size: 0.8em; color: #999; border-top: 1px solid #eee; padding: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 id="txt-header">📅 UPCOMING EVENTS & ACARA</h2>
+        <p style="margin:5px 0 0 0; font-size: 0.75em; color: #ccc;" id="txt-subheader">MERCURE BANDUNG NEXA SUPRATMAN EVENTS</p>
+        <div class="lang-switch">
+            <button class="lang-btn" onclick="setLang('id')" id="btn-id">🇮🇩</button>
+            <button class="lang-btn" onclick="setLang('en')" id="btn-en">🇬🇧</button>
+            <button class="lang-btn" onclick="setLang('cn')" id="btn-cn">🇨🇳</button>
+        </div>
+    </div>
+
+    <div class="grid-container" id="cards-container"></div>
+
+    <footer>Sentra Guest OS @ 2025 | SGO V1.0</footer>
+    <script>
+        const texts = {
+            'id': {
+                header: "📅 EVENT & ACARA MENDATANG",
+                subheader: "EVENT MERCURE BANDUNG NEXA SUPRATMAN"
+            },
+            'en': {
+                header: "📅 UPCOMING EVENTS",
+                subheader: "MERCURE BANDUNG NEXA SUPRATMAN EVENTS"
+            },
+            'cn': {
+                header: "📅 即将举行的活动",
+                subheader: "万隆美爵酒店 NEXA SUPRATMAN 活动"
+            }
+        };
+
+        const cardsData = [
+            {
+                img: "https://images.unsplash.com/photo-1555244162-803834f70033?w=600",
+                id: { title: "Saturday BBQ Night", desc: "Bergabunglah bersama kami setiap Sabtu malam di Nexa Garden. Hidangan BBQ lezat dengan iringan live music." },
+                en: { title: "Saturday BBQ Night", desc: "Join us every Saturday night at Nexa Garden. Delicious BBQ dishes with live music accompaniment." },
+                cn: { title: "周六烧烤之夜", desc: "每周六晚加入我们在 Nexa 花园的聚会。 美味的烧烤菜肴伴随着现场音乐。" }
+            },
+            {
+                img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600",
+                id: { title: "Sunday Morning Yoga", desc: "Mulailah hari Minggu Anda dengan segar. Sesi Yoga bersama instruktur profesional di area taman hotel." },
+                en: { title: "Sunday Morning Yoga", desc: "Start your Sunday fresh. Yoga session with professional instructors in the hotel garden area." },
+                cn: { title: "周日晨间瑜伽", desc: "精神焕发地开始您的周日。 在酒店花园区由专业教练指导的瑜伽课程。" }
+            }
+        ];
+
+        let currentLang = '{{ lang }}' || 'id';
+
+        function setLang(lang) {
+            currentLang = lang;
+            
+            // Update UI buttons
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            // Update Header
+            document.getElementById('txt-header').innerText = texts[lang].header;
+            document.getElementById('txt-subheader').innerText = texts[lang].subheader;
+
+            // Render Cards
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            cardsData.forEach(item => {
+                const content = item[lang];
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${item.img}">
+                        <div class="card-content">
+                            <h3>${content.title}</h3>
+                            <p>${content.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Initialize
+        setLang(currentLang);
+    </script>
+</html>

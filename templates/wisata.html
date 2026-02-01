@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #fdfdfd; color: #1a1a1a; margin: 0; padding: 15px; text-align: center; }
+        .header { background: #1a1a1a; color: #d4af37; padding: 25px; border: 2px solid #d4af37; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; }
+        .header h2 { margin: 0; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; }
+        .lang-switch { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
+        .lang-btn { cursor: pointer; font-size: 1.5em; background: none; border: none; filter: grayscale(100%); transition: 0.3s; }
+        .lang-btn.active, .lang-btn:hover { filter: grayscale(0%); transform: scale(1.2); }
+        .grid-container { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; text-align: left; }
+        .card img { width: 100%; height: 220px; object-fit: cover; background: #eee; }
+        .card-content { padding: 20px; }
+        h3 { color: #d4af37; margin: 0 0 12px 0; font-size: 1.4em; border-left: 5px solid #d4af37; padding-left: 12px; }
+        p { color: #555; font-size: 1em; line-height: 1.6; margin-bottom: 25px; height: auto; }
+        .map-btn { background: #1a1a1a; color: #d4af37; padding: 15px; border-radius: 12px; text-decoration: none; display: block; text-align: center; font-weight: bold; border: 2px solid #d4af37; font-size: 0.9em; }
+        footer { margin-top: 40px; font-size: 0.8em; color: #999; border-top: 1px solid #eee; padding: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2 id="txt-header">🗺️ BANDUNG HERITAGE & LEISURE</h2>
+        <p style="margin:5px 0 0 0; font-size: 0.75em; color: #ccc;" id="txt-subheader">MERCURE BANDUNG NEXA SUPRATMAN EXPERIENCE</p>
+        <div class="lang-switch">
+            <button class="lang-btn" onclick="setLang('id')" id="btn-id">🇮🇩</button>
+            <button class="lang-btn" onclick="setLang('en')" id="btn-en">🇬🇧</button>
+            <button class="lang-btn" onclick="setLang('cn')" id="btn-cn">🇨🇳</button>
+        </div>
+    </div>
+    <div class="grid-container" id="cards-container"></div>
+    <footer>Sentra Guest OS @ 2025 | SGO V1.0</footer>
+    <script>
+        const texts = {
+            'id': {
+                header: "🗺️ WISATA BANDUNG",
+                subheader: "PENGALAMAN MERCURE BANDUNG NEXA SUPRATMAN",
+                btn_map: "📍 BUKA NAVIGASI & CEK JARAK"
+            },
+            'en': {
+                header: "🗺️ BANDUNG TOURISM",
+                subheader: "MERCURE BANDUNG NEXA SUPRATMAN EXPERIENCE",
+                btn_map: "📍 OPEN NAVIGATION & CHECK DISTANCE"
+            },
+            'cn': {
+                header: "🗺️ 万隆旅游",
+                subheader: "万隆美爵酒店 NEXA SUPRATMAN 体验",
+                btn_map: "📍 打开导航并检查距离"
+            }
+        };
+
+        const cardsData = [
+            {
+                img: "https://images.unsplash.com/photo-1626244665487-19409848f066?w=800",
+                url: "https://www.google.com/maps/dir/?api=1&origin=Mercure+Bandung+Nexa+Supratman&destination=Gedung+Sate+Bandung",
+                id: { title: "Gedung Sate", desc: "Ikon sejarah Kota Bandung dengan arsitektur klasik. Jarak tempuh sangat dekat dari hotel." },
+                en: { title: "Gedung Sate", desc: "Historical icon of Bandung with classic architecture. Very close distance from the hotel." },
+                cn: { title: "沙爹大厦 (Gedung Sate)", desc: "具有古典建筑风格的万隆历史地标。 距离酒店非常近。" }
+            },
+            {
+                img: "https://images.unsplash.com/photo-1582215443202-73a729352220?w=800",
+                url: "https://www.google.com/maps/dir/?api=1&origin=Mercure+Bandung+Nexa+Supratman&destination=Jalan+Braga+Bandung",
+                id: { title: "Kawasan Braga", desc: "Nikmati suasana Eropa klasik dengan deretan kafe legendaris dan galeri seni." },
+                en: { title: "Braga Street", desc: "Enjoy the classic European atmosphere with legendary cafes and art galleries." },
+                cn: { title: "布拉加街 (Braga Street)", desc: "享受拥有传奇咖啡馆和艺术画廊的古典欧洲氛围。" }
+            },
+            {
+                img: "https://images.unsplash.com/photo-1590564310418-66304f55a2c2?w=800",
+                url: "https://www.google.com/maps/dir/?api=1&origin=Mercure+Bandung+Nexa+Supratman&destination=Floating+Market+Lembang",
+                id: { title: "Floating Market", desc: "Wisata kuliner unik di atas perahu dengan udara sejuk khas Lembang." },
+                en: { title: "Floating Market", desc: "Unique culinary tour on boats with the cool air of Lembang." },
+                cn: { title: "水上市场 (Floating Market)", desc: "在船上享受独特的烹饪之旅，感受伦邦凉爽的空气。" }
+            }
+        ];
+
+        let currentLang = '{{ lang }}' || 'id';
+
+        function setLang(lang) {
+            currentLang = lang;
+            
+            // Update UI buttons
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            // Update Header
+            document.getElementById('txt-header').innerText = texts[lang].header;
+            document.getElementById('txt-subheader').innerText = texts[lang].subheader;
+
+            // Render Cards
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            cardsData.forEach(item => {
+                const content = item[lang];
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${item.img}">
+                        <div class="card-content">
+                            <h3>${content.title}</h3>
+                            <p>${content.desc}</p>
+                            <a href="${item.url}" target="_blank" class="map-btn">${texts[lang].btn_map}</a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Initialize
+        setLang(currentLang);
+    </script>
+</html>
