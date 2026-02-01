@@ -1,5 +1,5 @@
 import threading, datetime, random, logging, sqlite3, os, io, asyncio
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand, BotCommandScopeChat
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from languages import TRANSLATIONS
@@ -62,11 +62,12 @@ app = Flask(__name__)
 # Error Handler untuk Debugging di Vercel
 @app.errorhandler(Exception)
 def handle_exception(e):
+    logging.error(f"Server Error: {e}", exc_info=True)
+    # Return JSON for API requests
+    if request.path.startswith('/api/'):
+        return jsonify({"status": "error", "message": str(e)}), 500
     # Pass through HTTP errors
-    if isinstance(e,  Exception):
-        logging.error(f"Server Error: {e}", exc_info=True)
-        return f"Internal Server Error: {str(e)}", 500
-    return f"Unknown Error", 500
+    return f"Internal Server Error: {str(e)}", 500
 
 def get_text(lang_code, key, **kwargs):
     return TRANSLATIONS.get(lang_code, TRANSLATIONS['id']).get(key, key).format(**kwargs)
